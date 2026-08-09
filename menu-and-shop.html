@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOPALVERSE — Menu, Player Window &amp; Shop Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #04070C;
+    --panel: #0B131C;
+    --panel-alt: #0F1B26;
+    --panel-border: #1C2E38;
+    --white: #EAF2F5;
+    --cyan: #2DE2E6;
+    --cyan-dim: #0B6E77;
+    --cyan-glow: rgba(45,226,230,0.35);
+    --danger: #FF3B5C;
+    --success: #39FF88;
+    --boss-amber: #FFB020;
+    --font-display: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(ellipse at 50% -10%, #0C1B22 0%, var(--void) 60%);
+    color: var(--white);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .game-frame {
+    width: 100%;
+    max-width: 420px;
+    background: var(--panel);
+    border: 2px solid var(--panel-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(45,226,230,0.08), 0 20px 40px rgba(0,0,0,0.6);
+    position: relative;
+    min-height: 640px;
+  }
+  .scanlines {
+    pointer-events: none; position: absolute; inset: 0;
+    background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 3px);
+    z-index: 50; mix-blend-mode: overlay;
+  }
+  .screen { display: none; min-height: 640px; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ===================== MAIN MENU ===================== */
+  #menuScreen {
+    position: relative;
+    justify-content: space-between;
+    background:
+      radial-gradient(circle at 75% 15%, rgba(45,226,230,0.10), transparent 45%),
+      radial-gradient(circle at 20% 80%, rgba(255,176,32,0.06), transparent 40%),
+      linear-gradient(180deg, #0A141C 0%, #050A10 100%);
+  }
+  .stars-bg {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 30% 55%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(1.5px 1.5px at 55% 20%, rgba(255,255,255,0.6), transparent),
+      radial-gradient(1px 1px at 75% 65%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 90% 30%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1.5px 1.5px at 15% 80%, rgba(255,255,255,0.4), transparent);
+    opacity: 0.7;
+  }
+  .planet {
+    position: absolute;
+    top: 40px; right: -30px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #1C3B44, #051217 70%);
+    box-shadow: 0 0 40px rgba(45,226,230,0.15), inset -10px -10px 30px rgba(0,0,0,0.6);
+  }
+  .logo-block { padding: 60px 24px 0; text-align: center; position: relative; z-index: 2; }
+  .logo-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 30px;
+    letter-spacing: 2px;
+    color: var(--white);
+    text-shadow: 0 0 20px var(--cyan-glow), 0 0 40px rgba(45,226,230,0.2);
+    animation: logoGlow 3s ease-in-out infinite;
+  }
+  @keyframes logoGlow {
+    0%, 100% { text-shadow: 0 0 20px var(--cyan-glow), 0 0 40px rgba(45,226,230,0.2); }
+    50% { text-shadow: 0 0 30px var(--cyan-glow), 0 0 60px rgba(45,226,230,0.35); }
+  }
+  .logo-sub {
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--cyan);
+    margin-top: 8px;
+  }
+  .logo-icon { font-size: 44px; filter: drop-shadow(0 0 12px var(--cyan-glow)); margin-bottom: 10px; }
+
+  .menu-buttons {
+    padding: 24px; display: flex; flex-direction: column; gap: 10px;
+    position: relative; z-index: 2;
+  }
+  .menu-btn {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .menu-btn.primary {
+    background: var(--cyan);
+    color: var(--void);
+    border: none;
+  }
+  .menu-btn.primary:hover { box-shadow: 0 0 20px var(--cyan-glow); }
+  .menu-btn.secondary {
+    background: rgba(255,255,255,0.03);
+    color: var(--white);
+    border: 1px solid var(--panel-border);
+  }
+  .menu-btn.secondary:hover { border-color: var(--cyan); color: var(--cyan); }
+  .menu-btn.disabled { opacity: 0.35; pointer-events: none; }
+  .menu-footer {
+    text-align: center; padding: 14px; font-family: var(--font-mono);
+    font-size: 9px; color: rgba(234,242,245,0.3); position: relative; z-index: 2;
+  }
+
+  /* ===================== PLAYER WINDOW ===================== */
+  #playerWindowScreen { background: var(--panel); }
+  .pw-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px; border-bottom: 1px solid var(--panel-border); background: var(--panel-alt);
+  }
+  .pw-title { font-family: var(--font-display); font-size: 13px; color: var(--cyan); letter-spacing: 1px; }
+  .back-btn {
+    background: none; border: 1px solid var(--panel-border); color: var(--white);
+    font-family: var(--font-mono); font-size: 10px; padding: 6px 10px; border-radius: 5px; cursor: pointer;
+  }
+  .back-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  .tabs { display: flex; border-bottom: 1px solid var(--panel-border); }
+  .tab-btn {
+    flex: 1; padding: 11px; text-align: center; font-family: var(--font-display);
+    font-size: 10px; letter-spacing: 0.5px; color: rgba(234,242,245,0.4);
+    background: var(--panel-alt); cursor: pointer; border-bottom: 2px solid transparent;
+  }
+  .tab-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); background: var(--panel); }
+
+  .tab-content { display: none; padding: 16px; flex: 1; overflow-y: auto; }
+  .tab-content.active { display: block; }
+
+  .stat-card {
+    background: var(--panel-alt); border: 1px solid var(--panel-border); border-radius: 8px;
+    padding: 12px; margin-bottom: 10px;
+  }
+  .stat-card-title { font-family: var(--font-mono); font-size: 9px; color: rgba(234,242,245,0.4); margin-bottom: 6px; letter-spacing: 0.5px; }
+  .stat-big-row { display: flex; justify-content: space-between; align-items: baseline; }
+  .stat-big { font-family: var(--font-display); font-size: 22px; color: var(--white); }
+  .stat-big.cyan { color: var(--cyan); }
+  .stat-big.amber { color: var(--boss-amber); }
+  .stat-unit { font-family: var(--font-mono); font-size: 10px; color: rgba(234,242,245,0.4); }
+
+  .progress-track {
+    height: 6px; background: #050B10; border-radius: 3px; overflow: hidden; margin-top: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--cyan-dim), var(--cyan)); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .inv-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--panel-alt); border: 1px solid var(--panel-border); border-radius: 8px;
+    padding: 10px; margin-bottom: 8px;
+  }
+  .inv-icon { font-size: 22px; }
+  .inv-name { font-weight: 600; font-size: 13px; }
+  .inv-desc { font-family: var(--font-mono); font-size: 9px; color: rgba(234,242,245,0.4); }
+  .empty-state { text-align: center; padding: 30px 10px; font-family: var(--font-mono); font-size: 11px; color: rgba(234,242,245,0.35); }
+
+  /* Shop */
+  .shop-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--panel-alt); border: 1px solid var(--panel-border); border-radius: 8px;
+    padding: 10px; margin-bottom: 8px;
+  }
+  .shop-icon { font-size: 24px; width: 30px; text-align: center; }
+  .shop-info { flex: 1; }
+  .shop-name { font-weight: 700; font-size: 13px; }
+  .shop-desc { font-family: var(--font-mono); font-size: 9px; color: rgba(234,242,245,0.4); margin-top: 2px; }
+  .buy-btn {
+    font-family: var(--font-display); font-size: 10px; padding: 8px 12px; border-radius: 6px;
+    border: 1px solid var(--boss-amber); color: var(--boss-amber); background: rgba(255,176,32,0.08);
+    cursor: pointer; white-space: nowrap;
+  }
+  .buy-btn:hover:not(:disabled) { background: var(--boss-amber); color: var(--void); }
+  .buy-btn:disabled { opacity: 0.3; cursor: default; border-color: var(--panel-border); color: rgba(234,242,245,0.3); background: none; }
+
+  .coin-strip {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px; background: rgba(255,176,32,0.06); border-bottom: 1px solid var(--panel-border);
+    font-family: var(--font-display); font-size: 15px; color: var(--boss-amber);
+  }
+
+  .toast {
+    position: absolute; bottom: 16px; left: 16px; right: 16px;
+    background: rgba(7,14,20,0.95); border: 1px solid var(--success); border-radius: 6px;
+    padding: 10px 12px; font-family: var(--font-mono); font-size: 11px; color: var(--success);
+    text-align: center; opacity: 0; transition: opacity 0.25s, transform 0.25s; transform: translateY(10px);
+    z-index: 60;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="game-frame">
+  <div class="scanlines"></div>
+
+  <!-- ===================== MAIN MENU ===================== -->
+  <div class="screen active" id="menuScreen">
+    <div class="stars-bg"></div>
+    <div class="planet"></div>
+    <div class="logo-block">
+      <div class="logo-icon">🛰️</div>
+      <div class="logo-title">NOPALVERSE</div>
+      <div class="logo-sub">SPACE ADVENTURE ACADEMY</div>
+    </div>
+    <div class="menu-buttons">
+      <div class="menu-btn primary" onclick="startNewGame()">▶ PLAY</div>
+      <div class="menu-btn secondary" id="continueBtn" onclick="continueGame()">CONTINUE</div>
+      <div class="menu-btn secondary" onclick="openPlayerWindow('stats')">PROFILE</div>
+    </div>
+    <div class="menu-footer">v0.1 PROTOTYPE — PHASE 6 DEMO</div>
+  </div>
+
+  <!-- ===================== PLAYER WINDOW ===================== -->
+  <div class="screen" id="playerWindowScreen">
+    <div class="pw-header">
+      <div class="pw-title">PLAYER WINDOW</div>
+      <button class="back-btn" onclick="backToMenu()">← BACK</button>
+    </div>
+    <div class="coin-strip">◆ <span id="pwCoinTop">0</span> COIN</div>
+    <div class="tabs">
+      <div class="tab-btn active" data-tab="stats" onclick="switchTab('stats')">STATS</div>
+      <div class="tab-btn" data-tab="inventory" onclick="switchTab('inventory')">INVENTORY</div>
+      <div class="tab-btn" data-tab="shop" onclick="switchTab('shop')">SHOP</div>
+    </div>
+
+    <!-- STATS TAB -->
+    <div class="tab-content active" id="tab-stats">
+      <div class="grid-2">
+        <div class="stat-card">
+          <div class="stat-card-title">HEALTH</div>
+          <div class="stat-big-row"><span class="stat-big" id="statHp">20</span><span class="stat-unit">/ 20 HP</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">SCORE</div>
+          <div class="stat-big-row"><span class="stat-big cyan" id="statScore">0</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">KEYS HELD</div>
+          <div class="stat-big-row"><span class="stat-big amber" id="statKeys">0</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">ACCURACY</div>
+          <div class="stat-big-row"><span class="stat-big" id="statAcc">0%</span></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">DUNGEON PROGRESS</div>
+        <div class="stat-big-row"><span class="stat-big cyan" id="statRoom">3</span><span class="stat-unit">/ 50 ROOMS</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:6%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">CORRECT / WRONG ANSWERS</div>
+        <div class="stat-big-row"><span class="stat-big" id="statCW">0 / 0</span></div>
+      </div>
+    </div>
+
+    <!-- INVENTORY TAB -->
+    <div class="tab-content" id="tab-inventory">
+      <div id="invList"></div>
+    </div>
+
+    <!-- SHOP TAB -->
+    <div class="tab-content" id="tab-shop">
+      <div id="shopList"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   PROTOTYPE STATE — mirrors the Player class from game-logic.js
+   Real build: this data flows from the live game session,
+   persisted via backend/save-file once the game is deployed
+   (browser storage APIs are not available inside artifacts).
+   ========================================================= */
+const player = {
+  hp: 17, maxHp: 20, coin: 42, score: 118, keys: 1,
+  correct: 9, wrong: 3, roomReached: 3,
+  powerUps: ["Extra HP +5"]
+};
+
+const hasSave = true; // demo flag — simulates "player has played before"
+
+const SHOP_ITEMS = [
+  { id: "extra_hp", icon: "❤️‍🩹", name: "Extra HP +5", desc: "Permanently raises max HP by 5", price: 15 },
+  { id: "attack_boost", icon: "⚔️", name: "Attack Boost x1.5", desc: "Deal 1.5x mark damage to enemies", price: 20 },
+  { id: "shield", icon: "🛡️", name: "Shield (1 hit)", desc: "Blocks the next wrong-answer damage", price: 10 },
+  { id: "coin_magnet", icon: "🧲", name: "Coin Magnet", desc: "+20% coin from correct answers", price: 25 },
+  { id: "revive", icon: "✨", name: "Full Revive", desc: "Restore HP to maximum instantly", price: 50 },
+];
+
+function init() {
+  document.getElementById("continueBtn").classList.toggle("disabled", !hasSave);
+  renderPlayerWindow();
+}
+
+function startNewGame() {
+  showToastOnMenu("Starting new run... (loads Room 1 exploration screen)");
+}
+function continueGame() {
+  if (!hasSave) return;
+  showToastOnMenu(`Resuming from Room ${player.roomReached}...`);
+}
+function showToastOnMenu(msg) {
+  alert(msg); // simple stub for demo — full build transitions screens directly
+}
+
+function openPlayerWindow(tab) {
+  document.getElementById("menuScreen").classList.remove("active");
+  document.getElementById("playerWindowScreen").classList.add("active");
+  switchTab(tab || "stats");
+  renderPlayerWindow();
+}
+function backToMenu() {
+  document.getElementById("playerWindowScreen").classList.remove("active");
+  document.getElementById("menuScreen").classList.add("active");
+}
+
+function switchTab(tab) {
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  document.querySelectorAll(".tab-content").forEach(c => c.classList.toggle("active", c.id === `tab-${tab}`));
+}
+
+function renderPlayerWindow() {
+  document.getElementById("pwCoinTop").textContent = Math.round(player.coin);
+  document.getElementById("statHp").textContent = player.hp;
+  document.getElementById("statScore").textContent = Math.round(player.score);
+  document.getElementById("statKeys").textContent = player.keys;
+  const total = player.correct + player.wrong;
+  const acc = total > 0 ? Math.round((player.correct / total) * 100) : 0;
+  document.getElementById("statAcc").textContent = `${acc}%`;
+  document.getElementById("statRoom").textContent = player.roomReached;
+  document.getElementById("progressFill").style.width = `${(player.roomReached / 50) * 100}%`;
+  document.getElementById("statCW").textContent = `${player.correct} / ${player.wrong}`;
+
+  renderInventory();
+  renderShop();
+}
+
+function renderInventory() {
+  const list = document.getElementById("invList");
+  if (player.powerUps.length === 0) {
+    list.innerHTML = `<div class="empty-state">No power-ups yet. Defeat enemies or visit the Shop.</div>`;
+    return;
+  }
+  list.innerHTML = player.powerUps.map(name => {
+    const item = SHOP_ITEMS.find(i => i.name === name);
+    return `<div class="inv-item">
+      <div class="inv-icon">${item ? item.icon : "✦"}</div>
+      <div>
+        <div class="inv-name">${name}</div>
+        <div class="inv-desc">${item ? item.desc : "Active power-up"}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderShop() {
+  const list = document.getElementById("shopList");
+  list.innerHTML = SHOP_ITEMS.map(item => {
+    const owned = item.id !== "revive" && player.powerUps.includes(item.name);
+    const canAfford = player.coin >= item.price;
+    const disabled = owned || !canAfford;
+    return `<div class="shop-item">
+      <div class="shop-icon">${item.icon}</div>
+      <div class="shop-info">
+        <div class="shop-name">${item.name}</div>
+        <div class="shop-desc">${item.desc} · ◆${item.price}</div>
+      </div>
+      <button class="buy-btn" ${disabled ? "disabled" : ""} onclick="buyItem('${item.id}')">
+        ${owned ? "OWNED" : "BUY"}
+      </button>
+    </div>`;
+  }).join("");
+}
+
+function buyItem(id) {
+  const item = SHOP_ITEMS.find(i => i.id === id);
+  if (!item || player.coin < item.price) return;
+
+  player.coin -= item.price;
+
+  if (item.id === "revive") {
+    player.hp = player.maxHp;
+  } else if (item.id === "extra_hp") {
+    player.maxHp += 5; player.hp += 5;
+  } else {
+    if (!player.powerUps.includes(item.name)) player.powerUps.push(item.name);
+  }
+
+  showToast(`Purchased ${item.name}!`);
+  renderPlayerWindow();
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove("show"), 1800);
+}
+
+init();
+</script>
+
+</body>
+</html>

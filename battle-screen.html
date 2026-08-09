@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOPALVERSE — Battle Screen Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #04070C;
+    --panel: #0B131C;
+    --panel-alt: #0F1B26;
+    --panel-border: #1C2E38;
+    --white: #EAF2F5;
+    --cyan: #2DE2E6;
+    --cyan-dim: #0B6E77;
+    --cyan-glow: rgba(45,226,230,0.35);
+    --danger: #FF3B5C;
+    --success: #39FF88;
+    --boss-amber: #FFB020;
+    --font-display: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: radial-gradient(ellipse at 50% -10%, #0C1B22 0%, var(--void) 60%);
+    color: var(--white);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .game-frame {
+    width: 100%;
+    max-width: 420px;
+    background: var(--panel);
+    border: 2px solid var(--panel-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(45,226,230,0.08), 0 20px 40px rgba(0,0,0,0.6);
+    position: relative;
+  }
+
+  /* ---------- Scanline overlay ---------- */
+  .scanlines {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.025) 0px,
+      rgba(255,255,255,0.025) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    z-index: 50;
+    mix-blend-mode: overlay;
+  }
+
+  /* ---------- Battle Arena ---------- */
+  .arena {
+    position: relative;
+    height: 260px;
+    background:
+      radial-gradient(circle at 80% 20%, rgba(45,226,230,0.08), transparent 40%),
+      linear-gradient(180deg, #0A141C 0%, #071019 100%);
+    border-bottom: 1px solid var(--panel-border);
+    overflow: hidden;
+  }
+
+  .stars {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 90px 90px, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1.5px 1.5px at 160px 40px, rgba(255,255,255,0.6), transparent),
+      radial-gradient(1px 1px at 250px 120px, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 320px 60px, rgba(255,255,255,0.5), transparent);
+    opacity: 0.6;
+  }
+
+  /* Enemy panel - top right, Pokemon style */
+  .enemy-panel {
+    position: absolute;
+    top: 14px; left: 14px; right: 14px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .status-card {
+    background: rgba(11,19,28,0.85);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    min-width: 170px;
+    backdrop-filter: blur(2px);
+  }
+
+  .status-card.boss {
+    border-color: var(--boss-amber);
+    box-shadow: 0 0 12px rgba(255,176,32,0.25);
+  }
+
+  .status-name-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+
+  .status-name {
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: var(--white);
+    text-transform: uppercase;
+  }
+
+  .status-lv {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--cyan);
+  }
+
+  .hp-track {
+    height: 8px;
+    background: #050B10;
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    gap: 1px;
+    padding: 1px;
+  }
+
+  .hp-segment {
+    flex: 1;
+    background: #142028;
+    border-radius: 1px;
+    transition: background 0.25s;
+  }
+
+  .hp-segment.filled { background: var(--success); }
+  .hp-segment.filled.mid { background: var(--boss-amber); }
+  .hp-segment.filled.low { background: var(--danger); }
+
+  .hp-numeric {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(234,242,245,0.6);
+    text-align: right;
+    margin-top: 3px;
+  }
+
+  .sprite {
+    position: absolute;
+    font-size: 64px;
+    filter: drop-shadow(0 0 14px var(--cyan-glow));
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .sprite.enemy { top: 62px; right: 30px; }
+  .sprite.player { bottom: 14px; left: 24px; font-size: 54px; transform: scaleX(-1); }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .sprite.player { animation: floatP 3s ease-in-out infinite; }
+  @keyframes floatP {
+    0%, 100% { transform: scaleX(-1) translateY(0); }
+    50% { transform: scaleX(-1) translateY(-6px); }
+  }
+
+  .sprite.hit { animation: hitShake 0.35s; }
+  @keyframes hitShake {
+    0%, 100% { transform: translateX(0); filter: drop-shadow(0 0 14px var(--danger)); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  .player-panel {
+    position: absolute;
+    bottom: 14px; left: 14px;
+  }
+
+  .combo-badge {
+    position: absolute;
+    top: 14px; left: 14px;
+    background: rgba(45,226,230,0.12);
+    border: 1px solid var(--cyan);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    color: var(--cyan);
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.25s;
+  }
+  .combo-badge.show { opacity: 1; transform: scale(1); }
+  .combo-badge.pulse { animation: comboPulse 0.4s; }
+  @keyframes comboPulse {
+    0% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+
+  /* Floating damage numbers */
+  .float-dmg {
+    position: absolute;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 22px;
+    pointer-events: none;
+    animation: floatUp 0.9s ease-out forwards;
+    z-index: 10;
+  }
+  .float-dmg.dmg-enemy { color: var(--cyan); right: 60px; top: 100px; }
+  .float-dmg.dmg-player { color: var(--danger); left: 60px; bottom: 60px; }
+  @keyframes floatUp {
+    0% { opacity: 0; transform: translateY(10px) scale(0.8); }
+    20% { opacity: 1; transform: translateY(0) scale(1.1); }
+    100% { opacity: 0; transform: translateY(-30px) scale(1); }
+  }
+
+  /* ---------- Terminal / question box ---------- */
+  .terminal {
+    background: var(--panel-alt);
+    border-top: 1px solid var(--panel-border);
+    padding: 14px 16px 16px;
+    position: relative;
+  }
+
+  .terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .terminal-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--cyan-dim);
+    letter-spacing: 1px;
+  }
+
+  .icon-btn {
+    background: none;
+    border: 1px solid var(--panel-border);
+    color: var(--white);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .icon-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  .question-box {
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    background: #070E14;
+    padding: 12px;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .question-box.glitch::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--danger);
+    opacity: 0;
+    animation: glitchFlash 0.3s;
+  }
+  @keyframes glitchFlash {
+    0%, 100% { opacity: 0; }
+    30% { opacity: 0.15; }
+    60% { opacity: 0; }
+    80% { opacity: 0.1; }
+  }
+
+  .question-box.correct-flash::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--success);
+    opacity: 0;
+    animation: glitchFlash 0.3s;
+  }
+
+  .question-text {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--white);
+  }
+
+  .answers-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .answer-btn {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    color: var(--white);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 14px;
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+  }
+  .answer-btn:hover:not(:disabled) {
+    border-color: var(--cyan);
+    background: rgba(45,226,230,0.06);
+  }
+  .answer-btn:disabled { cursor: default; opacity: 0.6; }
+  .answer-btn .opt-letter {
+    font-family: var(--font-display);
+    font-size: 11px;
+    color: var(--cyan);
+    width: 18px;
+  }
+
+  .answer-btn.correct-pick {
+    border-color: var(--success);
+    background: rgba(57,255,136,0.1);
+    color: var(--success);
+  }
+  .answer-btn.wrong-pick {
+    border-color: var(--danger);
+    background: rgba(255,59,92,0.1);
+    color: var(--danger);
+  }
+  .answer-btn.reveal-correct {
+    border-color: var(--success);
+    box-shadow: 0 0 0 1px var(--success) inset;
+  }
+
+  .tf-grid { grid-template-columns: 1fr 1fr; }
+
+  .feedback-line {
+    margin-top: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(234,242,245,0.7);
+    min-height: 14px;
+  }
+  .feedback-line.wrong { color: var(--danger); }
+  .feedback-line.right { color: var(--success); }
+
+  .bottom-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    gap: 8px;
+  }
+  .bottom-actions .icon-btn { flex: 1; text-align: center; }
+
+  /* ---------- Victory overlay ---------- */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(4,7,12,0.92);
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .overlay.show { opacity: 1; pointer-events: all; }
+
+  .overlay h2 {
+    font-family: var(--font-display);
+    color: var(--cyan);
+    font-size: 20px;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    text-shadow: 0 0 20px var(--cyan-glow);
+  }
+
+  .reward-row {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--white);
+    margin: 4px 0;
+  }
+  .reward-row .label { color: rgba(234,242,245,0.5); }
+  .reward-row .val { color: var(--boss-amber); }
+
+  .cta-btn {
+    margin-top: 18px;
+    background: var(--cyan);
+    color: var(--void);
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  /* Player window modal */
+  .modal-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 70;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal-box {
+    background: var(--panel);
+    border: 1px solid var(--cyan);
+    border-radius: 8px;
+    padding: 18px;
+    width: 100%;
+  }
+  .modal-box h3 {
+    font-family: var(--font-display);
+    font-size: 13px;
+    color: var(--cyan);
+    margin-bottom: 12px;
+  }
+  .stat-line {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+</style>
+</head>
+<body>
+
+<div class="game-frame">
+  <div class="scanlines"></div>
+
+  <div class="arena">
+    <div class="stars"></div>
+
+    <div class="enemy-panel">
+      <div class="status-card" id="enemyCard">
+        <div class="status-name-row">
+          <span class="status-name" id="enemyName">Firewall Wraith</span>
+          <span class="status-lv" id="enemyType">NORMAL</span>
+        </div>
+        <div class="hp-track" id="enemyHpTrack"></div>
+        <div class="hp-numeric" id="enemyHpNum">10 / 10</div>
+      </div>
+    </div>
+
+    <div class="combo-badge" id="comboBadge">COMBO x0</div>
+    <div class="sprite enemy" id="enemySprite">👾</div>
+    <div class="sprite player" id="playerSprite">🧑‍🚀</div>
+
+    <div class="player-panel">
+      <div class="status-card">
+        <div class="status-name-row">
+          <span class="status-name">Cadet Nova</span>
+          <span class="status-lv">YOU</span>
+        </div>
+        <div class="hp-track" id="playerHpTrack"></div>
+        <div class="hp-numeric" id="playerHpNum">20 / 20</div>
+      </div>
+    </div>
+
+    <!-- Victory overlay -->
+    <div class="overlay" id="victoryOverlay">
+      <h2>ENEMY DEFEATED</h2>
+      <div class="reward-row"><span class="label">Coins earned</span> <span class="val" id="rwCoin">+0</span></div>
+      <div class="reward-row"><span class="label">Key obtained</span> <span class="val" id="rwKey">—</span></div>
+      <div class="reward-row"><span class="label">Power-up</span> <span class="val" id="rwPowerup">—</span></div>
+      <button class="cta-btn" onclick="location.reload()">CONTINUE →</button>
+    </div>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-header">
+      <span class="terminal-tag" id="qCounter">QUESTION 1 / 5</span>
+      <span class="terminal-tag" id="qDifficulty">[SENANG]</span>
+    </div>
+
+    <div class="question-box" id="questionBox">
+      <div class="question-text" id="questionText">Loading question...</div>
+    </div>
+
+    <div class="answers-grid" id="answersGrid"></div>
+
+    <div class="feedback-line" id="feedbackLine"></div>
+
+    <div class="bottom-actions">
+      <button class="icon-btn" onclick="openPlayerWindow()">🎒 PLAYER WINDOW</button>
+      <button class="icon-btn" onclick="fleebattle()">⎋ FLEE</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="playerWindowModal">
+    <div class="modal-box">
+      <h3>PLAYER WINDOW</h3>
+      <div class="stat-line"><span>Coins</span><span id="pwCoin">0</span></div>
+      <div class="stat-line"><span>Score</span><span id="pwScore">0</span></div>
+      <div class="stat-line"><span>Keys</span><span id="pwKeys">0</span></div>
+      <div class="stat-line"><span>Correct / Wrong</span><span id="pwAcc">0 / 0</span></div>
+      <button class="icon-btn" style="width:100%; margin-top:10px;" onclick="closePlayerWindow()">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   PROTOTYPE DATA — In the full build this comes from
+   questions_data.json + game-logic.js + room-system.js
+   ========================================================= */
+const SAMPLE_QUEUE = [
+  { id:"tf_042", type:"true_false", difficulty:"senang", question:"IPO stands for Input, Process, Output.", correctAnswer:true, coin:1, mark:1, score:5, damageToPlayer:1 },
+  { id:"mc_021", type:"multiple_choice", difficulty:"sederhana", question:"What statement is used for a Single Selection structure?", options:["IF statement","IF-ELSE statement","IF-ELSE IF-ELSE statement"], correctAnswer:0, coin:2, mark:3, score:8, damageToPlayer:2 },
+  { id:"tf_043", type:"true_false", difficulty:"senang", question:"Input refers to the steps used to manipulate data.", correctAnswer:false, explanation:"That is Process", coin:1, mark:1, score:5, damageToPlayer:1 },
+  { id:"mc_001", type:"multiple_choice", difficulty:"susah", question:"What does the acronym IPO stand for?", options:["Input, Program, Output","Input, Process, Output","Information, Process, Output"], correctAnswer:1, coin:3, mark:5, score:10, damageToPlayer:4 },
+  { id:"tf_048", type:"true_false", difficulty:"senang", question:"There are exactly four types of control structures mentioned in the notes.", correctAnswer:false, explanation:"There are 3", coin:1, mark:1, score:5, damageToPlayer:1 }
+];
+
+const state = {
+  player: { hp:20, maxHp:20, coin:0, score:0, keys:0, combo:0, correct:0, wrong:0 },
+  enemy: { hp:10, maxHp:10, name:"Firewall Wraith", type:"normal" },
+  qIndex: 0,
+  locked: false
+};
+
+function renderHpBar(trackId, hp, maxHp) {
+  const track = document.getElementById(trackId);
+  track.innerHTML = "";
+  const segments = 10;
+  const filledSegments = Math.round((hp / maxHp) * segments);
+  const pct = hp / maxHp;
+  for (let i = 0; i < segments; i++) {
+    const seg = document.createElement("div");
+    seg.className = "hp-segment";
+    if (i < filledSegments) {
+      seg.classList.add("filled");
+      if (pct <= 0.25) seg.classList.add("low");
+      else if (pct <= 0.5) seg.classList.add("mid");
+    }
+    track.appendChild(seg);
+  }
+}
+
+function renderStatus() {
+  renderHpBar("enemyHpTrack", state.enemy.hp, state.enemy.maxHp);
+  renderHpBar("playerHpTrack", state.player.hp, state.player.maxHp);
+  document.getElementById("enemyHpNum").textContent = `${state.enemy.hp} / ${state.enemy.maxHp}`;
+  document.getElementById("playerHpNum").textContent = `${state.player.hp} / ${state.player.maxHp}`;
+  document.getElementById("enemyName").textContent = state.enemy.name;
+  document.getElementById("enemyType").textContent = state.enemy.type.toUpperCase();
+
+  const combo = document.getElementById("comboBadge");
+  if (state.player.combo > 0) {
+    combo.textContent = `COMBO x${state.player.combo}`;
+    combo.classList.add("show");
+  } else {
+    combo.classList.remove("show");
+  }
+}
+
+function renderQuestion() {
+  const q = SAMPLE_QUEUE[state.qIndex];
+  document.getElementById("qCounter").textContent = `QUESTION ${state.qIndex + 1} / ${SAMPLE_QUEUE.length}`;
+  document.getElementById("qDifficulty").textContent = `[${q.difficulty.toUpperCase()}]`;
+  document.getElementById("questionText").textContent = q.question;
+  document.getElementById("feedbackLine").textContent = "";
+  document.getElementById("feedbackLine").className = "feedback-line";
+
+  const grid = document.getElementById("answersGrid");
+  grid.innerHTML = "";
+  grid.className = "answers-grid" + (q.type === "true_false" ? " tf-grid" : "");
+
+  if (q.type === "multiple_choice") {
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement("button");
+      btn.className = "answer-btn";
+      btn.innerHTML = `<span class="opt-letter">${String.fromCharCode(65+idx)}</span> ${opt}`;
+      btn.onclick = () => submitAnswer(idx === q.correctAnswer, btn, idx);
+      grid.appendChild(btn);
+    });
+  } else {
+    [true, false].forEach(val => {
+      const btn = document.createElement("button");
+      btn.className = "answer-btn";
+      btn.textContent = val ? "TRUE" : "FALSE";
+      btn.onclick = () => submitAnswer(val === q.correctAnswer, btn, val);
+      grid.appendChild(btn);
+    });
+  }
+  state.locked = false;
+}
+
+function spawnFloatDmg(text, cls) {
+  const el = document.createElement("div");
+  el.className = `float-dmg ${cls}`;
+  el.textContent = text;
+  document.querySelector(".arena").appendChild(el);
+  setTimeout(() => el.remove(), 900);
+}
+
+function submitAnswer(isCorrect, btnEl, pickedValue) {
+  if (state.locked) return;
+  state.locked = true;
+
+  const q = SAMPLE_QUEUE[state.qIndex];
+  const allBtns = document.querySelectorAll(".answer-btn");
+  allBtns.forEach(b => b.disabled = true);
+
+  const qBox = document.getElementById("questionBox");
+  const fb = document.getElementById("feedbackLine");
+
+  if (isCorrect) {
+    btnEl.classList.add("correct-pick");
+    qBox.classList.add("correct-flash");
+    setTimeout(() => qBox.classList.remove("correct-flash"), 350);
+
+    state.player.combo += 1;
+    state.player.correct += 1;
+    const comboBonus = Math.round(state.player.combo * 0.2 * 10) / 10;
+    const coinsEarned = Math.round((q.coin + comboBonus) * 10) / 10;
+    const scoreEarned = Math.round((q.score + comboBonus) * 10) / 10;
+    state.player.coin += coinsEarned;
+    state.player.score += scoreEarned;
+    state.enemy.hp = Math.max(0, state.enemy.hp - q.mark);
+
+    document.getElementById("enemySprite").classList.add("hit");
+    setTimeout(() => document.getElementById("enemySprite").classList.remove("hit"), 350);
+    spawnFloatDmg(`-${q.mark}`, "dmg-enemy");
+
+    fb.textContent = `CORRECT! +${coinsEarned} coin, +${scoreEarned} score (combo bonus +${comboBonus})`;
+    fb.className = "feedback-line right";
+
+    const comboBadge = document.getElementById("comboBadge");
+    comboBadge.classList.add("pulse");
+    setTimeout(() => comboBadge.classList.remove("pulse"), 400);
+
+  } else {
+    btnEl.classList.add("wrong-pick");
+    qBox.classList.add("glitch");
+    setTimeout(() => qBox.classList.remove("glitch"), 350);
+
+    // reveal correct answer
+    if (q.type === "multiple_choice") {
+      allBtns[q.correctAnswer].classList.add("reveal-correct");
+    } else {
+      allBtns[q.correctAnswer ? 0 : 1].classList.add("reveal-correct");
+    }
+
+    state.player.combo = 0;
+    state.player.wrong += 1;
+    state.player.hp = Math.max(0, state.player.hp - q.damageToPlayer);
+
+    document.getElementById("playerSprite").classList.add("hit");
+    setTimeout(() => document.getElementById("playerSprite").classList.remove("hit"), 350);
+    spawnFloatDmg(`-${q.damageToPlayer}`, "dmg-player");
+
+    const correctText = q.type === "multiple_choice" ? q.options[q.correctAnswer] : (q.correctAnswer ? "True" : "False");
+    fb.textContent = `WRONG. Correct answer: "${correctText}"${q.explanation ? " — " + q.explanation : ""}`;
+    fb.className = "feedback-line wrong";
+  }
+
+  renderStatus();
+
+  setTimeout(() => {
+    if (state.enemy.hp <= 0) {
+      showVictory();
+    } else if (state.player.hp <= 0) {
+      fb.textContent = "YOU HAVE BEEN DEFEATED. (Revive screen comes in Phase 7)";
+      fb.className = "feedback-line wrong";
+    } else if (state.qIndex < SAMPLE_QUEUE.length - 1) {
+      state.qIndex += 1;
+      renderQuestion();
+    } else {
+      fb.textContent = "Out of sample questions — full game pulls more from question bank.";
+    }
+  }, 1400);
+}
+
+function showVictory() {
+  document.getElementById("rwCoin").textContent = `+${Math.round(state.player.coin*10)/10}`;
+  document.getElementById("rwKey").textContent = "Obtained";
+  document.getElementById("rwPowerup").textContent = "Attack Boost x1.5";
+  document.getElementById("victoryOverlay").classList.add("show");
+}
+
+function openPlayerWindow() {
+  document.getElementById("pwCoin").textContent = Math.round(state.player.coin*10)/10;
+  document.getElementById("pwScore").textContent = Math.round(state.player.score*10)/10;
+  document.getElementById("pwKeys").textContent = state.player.keys;
+  document.getElementById("pwAcc").textContent = `${state.player.correct} / ${state.player.wrong}`;
+  document.getElementById("playerWindowModal").classList.add("show");
+}
+function closePlayerWindow() {
+  document.getElementById("playerWindowModal").classList.remove("show");
+}
+function fleeBattle() {
+  alert("Fled the battle! (Returns to room exploration screen — built in Phase 5)");
+}
+function fleebattle(){ fleeBattle(); }
+
+renderStatus();
+renderQuestion();
+</script>
+
+</body>
+</html>

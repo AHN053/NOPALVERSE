@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOPALVERSE — Result & Game Over Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #04070C;
+    --panel: #0B131C;
+    --panel-alt: #0F1B26;
+    --panel-border: #1C2E38;
+    --white: #EAF2F5;
+    --cyan: #2DE2E6;
+    --cyan-dim: #0B6E77;
+    --cyan-glow: rgba(45,226,230,0.35);
+    --danger: #FF3B5C;
+    --danger-glow: rgba(255,59,92,0.35);
+    --success: #39FF88;
+    --boss-amber: #FFB020;
+    --font-display: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: radial-gradient(ellipse at 50% -10%, #0C1B22 0%, var(--void) 60%);
+    color: var(--white);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .game-frame {
+    width: 100%;
+    max-width: 420px;
+    background: var(--panel);
+    border: 2px solid var(--panel-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(45,226,230,0.08), 0 20px 40px rgba(0,0,0,0.6);
+    position: relative;
+    min-height: 620px;
+  }
+  .scanlines {
+    pointer-events: none; position: absolute; inset: 0;
+    background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 3px);
+    z-index: 50; mix-blend-mode: overlay;
+  }
+  .screen { display: none; min-height: 620px; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* Demo switcher (not part of real game — just for this prototype) */
+  .demo-switcher {
+    display: flex; gap: 6px; padding: 8px; background: #000; border-bottom: 1px dashed var(--panel-border);
+  }
+  .demo-switcher button {
+    flex: 1; font-family: var(--font-mono); font-size: 9px; padding: 6px; background: var(--panel-alt);
+    border: 1px solid var(--panel-border); color: rgba(234,242,245,0.6); border-radius: 4px; cursor: pointer;
+  }
+  .demo-switcher button.active { color: var(--cyan); border-color: var(--cyan); }
+
+  /* ===================== RESULT SCREEN ===================== */
+  #resultScreen {
+    background:
+      radial-gradient(circle at 50% 0%, rgba(45,226,230,0.10), transparent 50%),
+      linear-gradient(180deg, #0A141C 0%, #050A10 100%);
+    justify-content: space-between;
+  }
+  .result-header { text-align: center; padding: 34px 20px 10px; }
+  .result-badge { font-size: 46px; filter: drop-shadow(0 0 16px var(--cyan-glow)); }
+  .result-title {
+    font-family: var(--font-display); font-size: 20px; letter-spacing: 1.5px; color: var(--white);
+    margin-top: 10px;
+  }
+  .result-sub { font-family: var(--font-mono); font-size: 11px; color: var(--cyan); margin-top: 4px; }
+
+  .result-score-block { text-align: center; padding: 10px 20px 20px; }
+  .result-score-num {
+    font-family: var(--font-display); font-size: 48px; color: var(--cyan);
+    text-shadow: 0 0 24px var(--cyan-glow);
+  }
+  .result-score-label { font-family: var(--font-mono); font-size: 10px; color: rgba(234,242,245,0.5); letter-spacing: 1px; }
+
+  .result-stats { padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .rstat-card {
+    background: var(--panel-alt); border: 1px solid var(--panel-border); border-radius: 8px; padding: 12px;
+  }
+  .rstat-label { font-family: var(--font-mono); font-size: 9px; color: rgba(234,242,245,0.4); margin-bottom: 4px; }
+  .rstat-val { font-family: var(--font-display); font-size: 18px; }
+  .rstat-val.good { color: var(--success); }
+  .rstat-val.bad { color: var(--danger); }
+  .rstat-val.amber { color: var(--boss-amber); }
+
+  .result-actions { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+  .btn {
+    font-family: var(--font-display); font-size: 13px; letter-spacing: 1px; padding: 14px;
+    border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .btn.primary { background: var(--cyan); color: var(--void); border: none; }
+  .btn.primary:hover { box-shadow: 0 0 20px var(--cyan-glow); }
+  .btn.secondary { background: rgba(255,255,255,0.03); color: var(--white); border: 1px solid var(--panel-border); }
+  .btn.secondary:hover { border-color: var(--cyan); color: var(--cyan); }
+  .btn.danger-btn { background: var(--danger); color: var(--white); border: none; }
+  .btn.danger-btn:hover { box-shadow: 0 0 20px var(--danger-glow); }
+  .btn:disabled, .btn.disabled { opacity: 0.35; pointer-events: none; }
+
+  /* ===================== GAME OVER SCREEN ===================== */
+  #gameOverScreen {
+    background:
+      radial-gradient(circle at 50% 20%, rgba(255,59,92,0.14), transparent 55%),
+      linear-gradient(180deg, #120608 0%, #050202 100%);
+    justify-content: space-between;
+    position: relative;
+  }
+  .go-glitch-overlay {
+    position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    background: repeating-linear-gradient(0deg, rgba(255,59,92,0.03) 0 2px, transparent 2px 4px);
+    animation: goFlicker 3s infinite;
+  }
+  @keyframes goFlicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: 0.4; }
+    94% { opacity: 1; }
+  }
+  .go-header { text-align: center; padding: 50px 24px 14px; position: relative; z-index: 2; }
+  .go-icon { font-size: 50px; filter: drop-shadow(0 0 18px var(--danger-glow)); }
+  .go-title {
+    font-family: var(--font-display); font-weight: 900; font-size: 24px; letter-spacing: 2px; color: var(--danger);
+    margin-top: 14px; text-shadow: 0 0 20px var(--danger-glow);
+    animation: goTitleGlitch 2.4s infinite;
+  }
+  @keyframes goTitleGlitch {
+    0%, 96%, 100% { transform: translate(0,0); }
+    97% { transform: translate(-2px, 1px); }
+    98% { transform: translate(2px, -1px); }
+  }
+  .go-sub {
+    font-family: var(--font-mono); font-size: 11px; color: rgba(234,242,245,0.5); margin-top: 10px; line-height: 1.5;
+  }
+
+  .go-status { padding: 16px 24px; position: relative; z-index: 2; }
+  .go-status-card {
+    background: rgba(11,19,28,0.7); border: 1px solid var(--panel-border); border-radius: 8px; padding: 14px;
+  }
+  .go-row { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; padding: 5px 0; }
+  .go-row .val { color: var(--boss-amber); }
+
+  .go-actions { padding: 20px 24px; display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 2; }
+  .revive-note {
+    font-family: var(--font-mono); font-size: 9px; color: rgba(234,242,245,0.4); text-align: center; margin-top: -4px;
+  }
+</style>
+</head>
+<body>
+
+<div class="game-frame">
+  <div class="scanlines"></div>
+
+  <div class="demo-switcher">
+    <button class="active" onclick="showDemo('result')" id="btnDemoResult">RESULT SCREEN</button>
+    <button onclick="showDemo('gameover')" id="btnDemoOver">GAME OVER SCREEN</button>
+  </div>
+
+  <!-- ===================== RESULT SCREEN ===================== -->
+  <div class="screen active" id="resultScreen">
+    <div>
+      <div class="result-header">
+        <div class="result-badge">🏆</div>
+        <div class="result-title">BOSS DEFEATED</div>
+        <div class="result-sub">ROOM 5 CLEARED — OVERLORD KERNEL</div>
+      </div>
+      <div class="result-score-block">
+        <div class="result-score-num" id="rsScore">186</div>
+        <div class="result-score-label">TOTAL SCORE</div>
+      </div>
+      <div class="result-stats">
+        <div class="rstat-card">
+          <div class="rstat-label">CORRECT</div>
+          <div class="rstat-val good" id="rsCorrect">14</div>
+        </div>
+        <div class="rstat-card">
+          <div class="rstat-label">WRONG</div>
+          <div class="rstat-val bad" id="rsWrong">3</div>
+        </div>
+        <div class="rstat-card">
+          <div class="rstat-label">ACCURACY</div>
+          <div class="rstat-val" id="rsAccuracy">82%</div>
+        </div>
+        <div class="rstat-card">
+          <div class="rstat-label">COIN EARNED</div>
+          <div class="rstat-val amber" id="rsCoin">+47</div>
+        </div>
+      </div>
+    </div>
+    <div class="result-actions">
+      <div class="btn primary" onclick="playAgain()">↻ MAIN LAGI</div>
+      <div class="btn secondary" onclick="toMenu()">MAIN MENU</div>
+    </div>
+  </div>
+
+  <!-- ===================== GAME OVER SCREEN ===================== -->
+  <div class="screen" id="gameOverScreen">
+    <div class="go-glitch-overlay"></div>
+    <div class="go-header">
+      <div class="go-icon">⚠️</div>
+      <div class="go-title">SIGNAL LOST</div>
+      <div class="go-sub">Cadet Nova's vitals have flatlined.<br>The station's systems await your next move.</div>
+    </div>
+
+    <div class="go-status">
+      <div class="go-status-card">
+        <div class="go-row"><span>Coins on hand</span><span class="val" id="goCoin">62</span></div>
+        <div class="go-row"><span>Revive cost</span><span class="val">50</span></div>
+        <div class="go-row"><span>Room reached</span><span class="val" id="goRoom">3</span></div>
+      </div>
+    </div>
+
+    <div class="go-actions">
+      <div class="btn primary" id="reviveBtn" onclick="revive()">✨ REVIVE (50 COIN)</div>
+      <div class="revive-note" id="reviveNote"></div>
+      <div class="btn danger-btn" onclick="restartRun()">↻ START OVER (LOSE PROGRESS)</div>
+      <div class="btn secondary" onclick="toMenu()">MAIN MENU</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   PROTOTYPE STATE
+   ========================================================= */
+const runState = {
+  score: 186, correct: 14, wrong: 3, coinEarned: 47,
+  totalCoin: 62, roomReached: 3
+};
+
+function showDemo(which) {
+  document.getElementById("resultScreen").classList.toggle("active", which === "result");
+  document.getElementById("gameOverScreen").classList.toggle("active", which === "gameover");
+  document.getElementById("btnDemoResult").classList.toggle("active", which === "result");
+  document.getElementById("btnDemoOver").classList.toggle("active", which === "gameover");
+  if (which === "gameover") renderGameOver();
+}
+
+function renderResult() {
+  document.getElementById("rsScore").textContent = runState.score;
+  document.getElementById("rsCorrect").textContent = runState.correct;
+  document.getElementById("rsWrong").textContent = runState.wrong;
+  const total = runState.correct + runState.wrong;
+  const acc = total > 0 ? Math.round((runState.correct / total) * 100) : 0;
+  document.getElementById("rsAccuracy").textContent = `${acc}%`;
+  document.getElementById("rsCoin").textContent = `+${runState.coinEarned}`;
+}
+
+function renderGameOver() {
+  document.getElementById("goCoin").textContent = runState.totalCoin;
+  document.getElementById("goRoom").textContent = runState.roomReached;
+  const reviveBtn = document.getElementById("reviveBtn");
+  const note = document.getElementById("reviveNote");
+  if (runState.totalCoin < 50) {
+    reviveBtn.classList.add("disabled");
+    note.textContent = `Need ${50 - runState.totalCoin} more coin to revive.`;
+  } else {
+    reviveBtn.classList.remove("disabled");
+    note.textContent = "Revive restores full HP and keeps your current room progress.";
+  }
+}
+
+function playAgain() { alert("Loads next room / continues the run. (Full build: transitions to Room Exploration Screen)"); }
+function toMenu() { alert("Returns to Main Menu. (Full build: transitions to Menu Screen from Phase 6)"); }
+function revive() {
+  if (runState.totalCoin < 50) return;
+  runState.totalCoin -= 50;
+  alert(`Revived! HP restored to full. Coin left: ${runState.totalCoin}. (Returns to the room you died in)`);
+  renderGameOver();
+}
+function restartRun() {
+  if (confirm("This restarts the whole run from Room 1 and resets progress (coin/keys/power-ups kept per game design). Continue?")) {
+    alert("Run restarted from Room 1. (Full build: resets room progress, keeps meta-currency if designed that way)");
+  }
+}
+
+renderResult();
+</script>
+
+</body>
+</html>
