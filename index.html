@@ -1047,7 +1047,7 @@ const POWER_UP_POOL = [
   { id: "attack_boost", name: "Attack Boost x1.5", icon: "⚔️", desc: "Deal 1.5x mark damage to enemies", price: 20, apply: (p) => { p.attackMultiplier = 1.5; } },
   { id: "shield", name: "Shield (1 hit)", icon: "🛡️", desc: "Blocks the next wrong-answer damage", price: 10, apply: (p) => { p.shield += 1; } },
   { id: "coin_magnet", name: "Coin Magnet", icon: "🧲", desc: "+20% coin from correct answers", price: 25, apply: (p) => { p.coinMagnet = true; } },
-  { id: "revive", name: "Full Revive", icon: "✨", desc: "Restore HP to maximum instantly", price: 50, apply: (p) => { p.hp = p.maxHp; p.isAlive = true; } }
+  { id: "revive", name: "Full Revive", icon: "✨", desc: "Restore HP to maximum instantly", price: 20, apply: (p) => { p.hp = p.maxHp; p.isAlive = true; } }
 ];
 
 class CombatEngine {
