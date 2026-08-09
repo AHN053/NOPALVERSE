@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOPALVERSE — Space Adventure Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #04070C;
+    --panel: #0B131C;
+    --panel-alt: #0F1B26;
+    --panel-border: #1C2E38;
+    --white: #EAF2F5;
+    --cyan: #2DE2E6;
+    --cyan-dim: #0B6E77;
+    --cyan-glow: rgba(45,226,230,0.35);
+    --danger: #FF3B5C;
+    --danger-glow: rgba(255,59,92,0.35);
+    --success: #39FF88;
+    --boss-amber: #FFB020;
+    --font-display: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: radial-gradient(ellipse at 50% -10%, #0C1B22 0%, var(--void) 60%);
+    color: var(--white);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .game-frame {
+    width: 100%;
+    max-width: 420px;
+    background: var(--panel);
+    border: 2px solid var(--panel-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 60px rgba(45,226,230,0.08), 0 20px 40px rgba(0,0,0,0.6);
+    position: relative;
+    min-height: 640px;
+  }
+
+  .scanlines {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.025) 0px,
+      rgba(255,255,255,0.025) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    z-index: 50;
+    mix-blend-mode: overlay;
+  }
+
+  .screen { display: none; min-height: 640px; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ===================== MAIN MENU ===================== */
+  #menuScreen {
+    position: relative;
+    justify-content: space-between;
+    background:
+      radial-gradient(circle at 75% 15%, rgba(45,226,230,0.10), transparent 45%),
+      radial-gradient(circle at 20% 80%, rgba(255,176,32,0.06), transparent 40%),
+      linear-gradient(180deg, #0A141C 0%, #050A10 100%);
+  }
+  .stars-bg {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 30% 55%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(1.5px 1.5px at 55% 20%, rgba(255,255,255,0.6), transparent),
+      radial-gradient(1px 1px at 75% 65%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 90% 30%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1.5px 1.5px at 15% 80%, rgba(255,255,255,0.4), transparent);
+    opacity: 0.7;
+  }
+  .planet {
+    position: absolute;
+    top: 40px; right: -30px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #1C3B44, #051217 70%);
+    box-shadow: 0 0 40px rgba(45,226,230,0.15), inset -10px -10px 30px rgba(0,0,0,0.6);
+  }
+  .logo-block { padding: 60px 24px 0; text-align: center; position: relative; z-index: 2; }
+  .logo-title {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 30px;
+    letter-spacing: 2px;
+    color: var(--white);
+    text-shadow: 0 0 20px var(--cyan-glow), 0 0 40px rgba(45,226,230,0.2);
+    animation: logoGlow 3s ease-in-out infinite;
+  }
+  @keyframes logoGlow {
+    0%, 100% { text-shadow: 0 0 20px var(--cyan-glow), 0 0 40px rgba(45,226,230,0.2); }
+    50% { text-shadow: 0 0 30px var(--cyan-glow), 0 0 60px rgba(45,226,230,0.35); }
+  }
+  .logo-sub {
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--cyan);
+    margin-top: 8px;
+  }
+  .logo-icon { font-size: 44px; filter: drop-shadow(0 0 12px var(--cyan-glow)); margin-bottom: 10px; }
+
+  .menu-buttons {
+    padding: 24px; display: flex; flex-direction: column; gap: 10px;
+    position: relative; z-index: 2;
+  }
+  .menu-btn {
+    font-family: var(--font-display);
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .menu-btn.primary { background: var(--cyan); color: var(--void); border: none; }
+  .menu-btn.primary:hover { box-shadow: 0 0 20px var(--cyan-glow); }
+  .menu-btn.secondary { background: rgba(255,255,255,0.03); color: var(--white); border: 1px solid var(--panel-border); }
+  .menu-btn.secondary:hover { border-color: var(--cyan); color: var(--cyan); }
+  .menu-btn.disabled { opacity: 0.35; pointer-events: none; }
+  .menu-footer {
+    text-align: center; padding: 14px; font-family: var(--font-mono);
+    font-size: 9px; color: rgba(234,242,245,0.3); position: relative; z-index: 2;
+  }
+
+  /* ===================== BATTLE ARENA ===================== */
+  .arena {
+    position: relative;
+    height: 260px;
+    background:
+      radial-gradient(circle at 80% 20%, rgba(45,226,230,0.08), transparent 40%),
+      linear-gradient(180deg, #0A141C 0%, #071019 100%);
+    border-bottom: 1px solid var(--panel-border);
+    overflow: hidden;
+  }
+
+  .stars {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 90px 90px, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1.5px 1.5px at 160px 40px, rgba(255,255,255,0.6), transparent),
+      radial-gradient(1px 1px at 250px 120px, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 320px 60px, rgba(255,255,255,0.5), transparent);
+    opacity: 0.6;
+  }
+
+  .enemy-panel {
+    position: absolute;
+    top: 14px; left: 14px; right: 14px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .status-card {
+    background: rgba(11,19,28,0.85);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    min-width: 170px;
+    backdrop-filter: blur(2px);
+  }
+
+  .status-card.boss {
+    border-color: var(--boss-amber);
+    box-shadow: 0 0 12px rgba(255,176,32,0.25);
+  }
+
+  .status-name-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+
+  .status-name {
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: var(--white);
+    text-transform: uppercase;
+  }
+
+  .status-lv {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--cyan);
+  }
+
+  .hp-track {
+    height: 8px;
+    background: #050B10;
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    gap: 1px;
+    padding: 1px;
+  }
+
+  .hp-segment {
+    flex: 1;
+    background: #142028;
+    border-radius: 1px;
+    transition: background 0.25s;
+  }
+
+  .hp-segment.filled { background: var(--success); }
+  .hp-segment.filled.mid { background: var(--boss-amber); }
+  .hp-segment.filled.low { background: var(--danger); }
+
+  .hp-numeric {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(234,242,245,0.6);
+    text-align: right;
+    margin-top: 3px;
+  }
+
+  .sprite {
+    position: absolute;
+    font-size: 64px;
+    filter: drop-shadow(0 0 14px var(--cyan-glow));
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .sprite.enemy { top: 62px; right: 30px; }
+  .sprite.player { bottom: 14px; left: 24px; font-size: 54px; transform: scaleX(-1); }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .sprite.player { animation: floatP 3s ease-in-out infinite; }
+  @keyframes floatP {
+    0%, 100% { transform: scaleX(-1) translateY(0); }
+    50% { transform: scaleX(-1) translateY(-6px); }
+  }
+
+  .sprite.hit { animation: hitShake 0.35s; }
+  @keyframes hitShake {
+    0%, 100% { transform: translateX(0); filter: drop-shadow(0 0 14px var(--danger)); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  .player-panel {
+    position: absolute;
+    bottom: 14px; left: 14px;
+  }
+
+  .combo-badge {
+    position: absolute;
+    top: 14px; left: 14px;
+    background: rgba(45,226,230,0.12);
+    border: 1px solid var(--cyan);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    color: var(--cyan);
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.25s;
+  }
+  .combo-badge.show { opacity: 1; transform: scale(1); }
+  .combo-badge.pulse { animation: comboPulse 0.4s; }
+  @keyframes comboPulse {
+    0% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+
+  .float-dmg {
+    position: absolute;
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 22px;
+    pointer-events: none;
+    animation: floatUp 0.9s ease-out forwards;
+    z-index: 10;
+  }
+  .float-dmg.dmg-enemy { color: var(--cyan); right: 60px; top: 100px; }
+  .float-dmg.dmg-player { color: var(--danger); left: 60px; bottom: 60px; }
+  @keyframes floatUp {
+    0% { opacity: 0; transform: translateY(10px) scale(0.8); }
+    20% { opacity: 1; transform: translateY(0) scale(1.1); }
+    100% { opacity: 0; transform: translateY(-30px) scale(1); }
+  }
+
+  /* Terminal / Question Box */
+  .terminal {
+    background: var(--panel-alt);
+    border-top: 1px solid var(--panel-border);
+    padding: 14px 16px 16px;
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .terminal-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--cyan-dim);
+    letter-spacing: 1px;
+  }
+
+  .icon-btn {
+    background: none;
+    border: 1px solid var(--panel-border);
+    color: var(--white);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .icon-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  .question-box {
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    background: #070E14;
+    padding: 12px;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .question-box.glitch::before {
+    content: ''; position: absolute; inset: 0; background: var(--danger); opacity: 0;
+    animation: glitchFlash 0.3s;
+  }
+  @keyframes glitchFlash {
+    0%, 100% { opacity: 0; }
+    30% { opacity: 0.15; }
+    60% { opacity: 0; }
+    80% { opacity: 0.1; }
+  }
+
+  .question-box.correct-flash::before {
+    content: ''; position: absolute; inset: 0; background: var(--success); opacity: 0;
+    animation: glitchFlash 0.3s;
+  }
+
+  .question-text {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--white);
+  }
+
+  .answers-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .answer-btn {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    color: var(--white);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 14px;
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+  }
+  .answer-btn:hover:not(:disabled) {
+    border-color: var(--cyan);
+    background: rgba(45,226,230,0.06);
+  }
+  .answer-btn:disabled { cursor: default; opacity: 0.6; }
+  .answer-btn .opt-letter {
+    font-family: var(--font-display);
+    font-size: 11px;
+    color: var(--cyan);
+    width: 18px;
+  }
+
+  .answer-btn.correct-pick {
+    border-color: var(--success);
+    background: rgba(57,255,136,0.1);
+    color: var(--success);
+  }
+  .answer-btn.wrong-pick {
+    border-color: var(--danger);
+    background: rgba(255,59,92,0.1);
+    color: var(--danger);
+  }
+  .answer-btn.reveal-correct {
+    border-color: var(--success);
+    box-shadow: 0 0 0 1px var(--success) inset;
+  }
+
+  .tf-grid { grid-template-columns: 1fr 1fr; }
+
+  .feedback-line {
+    margin-top: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(234,242,245,0.7);
+    min-height: 14px;
+  }
+  .feedback-line.wrong { color: var(--danger); }
+  .feedback-line.right { color: var(--success); }
+
+  .bottom-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    gap: 8px;
+  }
+  .bottom-actions .icon-btn { flex: 1; text-align: center; }
+
+  /* Overlay Modal Victory inside battle */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(4,7,12,0.92);
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .overlay.show { opacity: 1; pointer-events: all; }
+
+  .overlay h2 {
+    font-family: var(--font-display);
+    color: var(--cyan);
+    font-size: 20px;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    text-shadow: 0 0 20px var(--cyan-glow);
+  }
+
+  .reward-row {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--white);
+    margin: 4px 0;
+  }
+  .reward-row .label { color: rgba(234,242,245,0.5); }
+  .reward-row .val { color: var(--boss-amber); }
+
+  .cta-btn {
+    margin-top: 18px;
+    background: var(--cyan);
+    color: var(--void);
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  /* ===================== PLAYER WINDOW & SHOP ===================== */
+  #playerWindowScreen { background: var(--panel); }
+  .pw-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px; border-bottom: 1px solid var(--panel-border); background: var(--panel-alt);
+  }
+  .pw-title { font-family: var(--font-display); font-size: 13px; color: var(--cyan); letter-spacing: 1px; }
+  .back-btn {
+    background: none; border: 1px solid var(--panel-border); color: var(--white);
+    font-family: var(--font-mono); font-size: 10px; padding: 6px 10px; border-radius: 5px; cursor: pointer;
+  }
+  .back-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  .tabs { display: flex; border-bottom: 1px solid var(--panel-border); }
+  .tab-btn {
+    flex: 1; padding: 11px; text-align: center; font-family: var(--font-display);
+    font-size: 10px; letter-spacing: 0.5px; color: rgba(234,242,245,0.4);
+    background: var(--panel-alt); cursor: pointer; border-bottom: 2px solid transparent;
+  }
+  .tab-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); background: var(--panel); }
+
+  .tab-content { display: none; padding: 16px; flex: 1; overflow-y: auto; }
+  .tab-content.active { display: block; }
+
+  .stat-card {
+    background: var(--panel-alt); border: 1px solid var(--panel-border); border-radius: 8px;
+    padding: 12px; margin-bottom: 10px;
+  }
+  .stat-card-title { font-family: var(--font-mono); font-size: 9px; color: rgba(234,242,245,0.4); margin-bottom: 6px; letter-spacing: 0.5px; }
+  .stat-big-row { display: flex; justify-content: space-between; align-items: baseline; }
+  .stat-big { font-family: var(--font-display); font-size: 22px; color: var(--white); }
+  .stat-big.cyan { color: var(--cyan); }
+  .stat-big.amber { color: var(--boss-amber); }
+  .stat-unit { font-family: var(--font-mono); font-size: 10px; color: rgba(234,242,245,0.4); }
+
+  .progress-track {
+    height: 6px; background: #050B10; border-radius: 3px; overflow: hidden; margin-top: 8px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--cyan-dim), var(--cyan)); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .inv-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--panel-alt); border: 1px solid var(--panel-border); border-radius: 8px;
+    padding: 10px; margin-bottom: 8px;
+  }
+  .inv-icon { font-size: 22px; }
+  .inv-name { font-weight: 600; font-size: 13px; }
+  .inv-desc { font-family: var(--font-mono); font-size: 9px; color: rgba(234,242,245,0.4); }
+  .empty-state { text-align: center; padding: 30px 10px; font-family: var(--font-mono); font-size: 11px; color: rgba(234,242,245,0.35); }
+
+  .shop-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--panel-alt); border: 1px solid var(--panel-border); border-radius: 8px;
+    padding: 10px; margin-bottom: 8px;
+  }
+  .shop-icon { font-size: 24px; width: 30px; text-align: center; }
+  .shop-info { flex: 1; }
+  .shop-name { font-weight: 700; font-size: 13px; }
+  .shop-desc { font-family: var(--font-mono); font-size: 9px; color: rgba(234,242,245,0.4); margin-top: 2px; }
+  .buy-btn {
+    font-family: var(--font-display); font-size: 10px; padding: 8px 12px; border-radius: 6px;
+    border: 1px solid var(--boss-amber); color: var(--boss-amber); background: rgba(255,176,32,0.08);
+    cursor: pointer; white-space: nowrap;
+  }
+  .buy-btn:hover:not(:disabled) { background: var(--boss-amber); color: var(--void); }
+  .buy-btn:disabled { opacity: 0.3; cursor: default; border-color: var(--panel-border); color: rgba(234,242,245,0.3); background: none; }
+
+  .coin-strip {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px; background: rgba(255,176,32,0.06); border-bottom: 1px solid var(--panel-border);
+    font-family: var(--font-display); font-size: 15px; color: var(--boss-amber);
+  }
+
+  .toast {
+    position: absolute; bottom: 16px; left: 16px; right: 16px;
+    background: rgba(7,14,20,0.95); border: 1px solid var(--success); border-radius: 6px;
+    padding: 10px 12px; font-family: var(--font-mono); font-size: 11px; color: var(--success);
+    text-align: center; opacity: 0; transition: opacity 0.25s, transform 0.25s; transform: translateY(10px);
+    z-index: 60;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ===================== RESULT SCREEN ===================== */
+  #resultScreen {
+    background:
+      radial-gradient(circle at 50% 0%, rgba(45,226,230,0.10), transparent 50%),
+      linear-gradient(180deg, #0A141C 0%, #050A10 100%);
+    justify-content: space-between;
+  }
+  .result-header { text-align: center; padding: 34px 20px 10px; }
+  .result-badge { font-size: 46px; filter: drop-shadow(0 0 16px var(--cyan-glow)); }
+  .result-title {
+    font-family: var(--font-display); font-size: 20px; letter-spacing: 1.5px; color: var(--white);
+    margin-top: 10px;
+  }
+  .result-sub { font-family: var(--font-mono); font-size: 11px; color: var(--cyan); margin-top: 4px; }
+
+  .result-score-block { text-align: center; padding: 10px 20px 20px; }
+  .result-score-num {
+    font-family: var(--font-display); font-size: 48px; color: var(--cyan);
+    text-shadow: 0 0 24px var(--cyan-glow);
+  }
+  .result-score-label { font-family: var(--font-mono); font-size: 10px; color: rgba(234,242,245,0.5); letter-spacing: 1px; }
+
+  .result-stats { padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .rstat-card {
+    background: var(--panel-alt); border: 1px solid var(--panel-border); border-radius: 8px; padding: 12px;
+  }
+  .rstat-label { font-family: var(--font-mono); font-size: 9px; color: rgba(234,242,245,0.4); margin-bottom: 4px; }
+  .rstat-val { font-family: var(--font-display); font-size: 18px; }
+  .rstat-val.good { color: var(--success); }
+  .rstat-val.bad { color: var(--danger); }
+  .rstat-val.amber { color: var(--boss-amber); }
+
+  .result-actions { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+
+  /* ===================== GAME OVER SCREEN ===================== */
+  #gameOverScreen {
+    background:
+      radial-gradient(circle at 50% 20%, rgba(255,59,92,0.14), transparent 55%),
+      linear-gradient(180deg, #120608 0%, #050202 100%);
+    justify-content: space-between;
+    position: relative;
+  }
+  .go-glitch-overlay {
+    position: absolute; inset: 0; pointer-events: none; z-index: 1;
+    background: repeating-linear-gradient(0deg, rgba(255,59,92,0.03) 0 2px, transparent 2px 4px);
+    animation: goFlicker 3s infinite;
+  }
+  @keyframes goFlicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: 0.4; }
+    94% { opacity: 1; }
+  }
+  .go-header { text-align: center; padding: 50px 24px 14px; position: relative; z-index: 2; }
+  .go-icon { font-size: 50px; filter: drop-shadow(0 0 18px var(--danger-glow)); }
+  .go-title {
+    font-family: var(--font-display); font-weight: 900; font-size: 24px; letter-spacing: 2px; color: var(--danger);
+    margin-top: 14px; text-shadow: 0 0 20px var(--danger-glow);
+    animation: goTitleGlitch 2.4s infinite;
+  }
+  @keyframes goTitleGlitch {
+    0%, 96%, 100% { transform: translate(0,0); }
+    97% { transform: translate(-2px, 1px); }
+    98% { transform: translate(2px, -1px); }
+  }
+  .go-sub {
+    font-family: var(--font-mono); font-size: 11px; color: rgba(234,242,245,0.5); margin-top: 10px; line-height: 1.5;
+  }
+
+  .go-status { padding: 16px 24px; position: relative; z-index: 2; }
+  .go-status-card {
+    background: rgba(11,19,28,0.7); border: 1px solid var(--panel-border); border-radius: 8px; padding: 14px;
+  }
+  .go-row { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; padding: 5px 0; }
+  .go-row .val { color: var(--boss-amber); }
+
+  .go-actions { padding: 20px 24px; display: flex; flex-direction: column; gap: 10px; position: relative; z-index: 2; }
+  .revive-note {
+    font-family: var(--font-mono); font-size: 9px; color: rgba(234,242,245,0.4); text-align: center; margin-top: -4px;
+  }
+
+  .btn {
+    font-family: var(--font-display); font-size: 13px; letter-spacing: 1px; padding: 14px;
+    border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.15s;
+  }
+  .btn.primary { background: var(--cyan); color: var(--void); border: none; }
+  .btn.primary:hover { box-shadow: 0 0 20px var(--cyan-glow); }
+  .btn.secondary { background: rgba(255,255,255,0.03); color: var(--white); border: 1px solid var(--panel-border); }
+  .btn.secondary:hover { border-color: var(--cyan); color: var(--cyan); }
+  .btn.danger-btn { background: var(--danger); color: var(--white); border: none; }
+  .btn.danger-btn:hover { box-shadow: 0 0 20px var(--danger-glow); }
+  .btn:disabled, .btn.disabled { opacity: 0.35; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<div class="game-frame">
+  <div class="scanlines"></div>
+
+  <!-- ===================== 1. MAIN MENU ===================== -->
+  <div class="screen active" id="menuScreen">
+    <div class="stars-bg"></div>
+    <div class="planet"></div>
+    <div class="logo-block">
+      <div class="logo-icon">🛰️</div>
+      <div class="logo-title">NOPALVERSE</div>
+      <div class="logo-sub">SPACE ADVENTURE ACADEMY</div>
+    </div>
+    <div class="menu-buttons">
+      <div class="menu-btn primary" onclick="startNewGame()">▶ PLAY</div>
+      <div class="menu-btn secondary" id="continueBtn" onclick="continueGame()">CONTINUE</div>
+      <div class="menu-btn secondary" onclick="openPlayerWindow('stats')">PROFILE & SHOP</div>
+    </div>
+    <div class="menu-footer">v1.0 INTEGRATED SYSTEM</div>
+  </div>
+
+  <!-- ===================== 2. BATTLE SCREEN ===================== -->
+  <div class="screen" id="battleScreen">
+    <div class="arena">
+      <div class="stars"></div>
+
+      <div class="enemy-panel">
+        <div class="status-card" id="enemyCard">
+          <div class="status-name-row">
+            <span class="status-name" id="enemyName">Firewall Wraith</span>
+            <span class="status-lv" id="enemyType">NORMAL</span>
+          </div>
+          <div class="hp-track" id="enemyHpTrack"></div>
+          <div class="hp-numeric" id="enemyHpNum">10 / 10</div>
+        </div>
+      </div>
+
+      <div class="combo-badge" id="comboBadge">COMBO x0</div>
+      <div class="sprite enemy" id="enemySprite">👾</div>
+      <div class="sprite player" id="playerSprite">🧑‍🚀</div>
+
+      <div class="player-panel">
+        <div class="status-card">
+          <div class="status-name-row">
+            <span class="status-name">Cadet Nova</span>
+            <span class="status-lv">YOU</span>
+          </div>
+          <div class="hp-track" id="playerHpTrack"></div>
+          <div class="hp-numeric" id="playerHpNum">20 / 20</div>
+        </div>
+      </div>
+
+      <!-- In-Battle Victory Overlay -->
+      <div class="overlay" id="victoryOverlay">
+        <h2>ENEMY DEFEATED</h2>
+        <div class="reward-row"><span class="label">Coins earned</span> <span class="val" id="rwCoin">+0</span></div>
+        <div class="reward-row"><span class="label">Key obtained</span> <span class="val" id="rwKey">—</span></div>
+        <div class="reward-row"><span class="label">Power-up</span> <span class="val" id="rwPowerup">—</span></div>
+        <button class="cta-btn" onclick="nextQuestionOrRoom()">CONTINUE →</button>
+      </div>
+    </div>
+
+    <div class="terminal">
+      <div class="terminal-header">
+        <span class="terminal-tag" id="qCounter">QUESTION 1 / 5</span>
+        <span class="terminal-tag" id="qDifficulty">[SENANG]</span>
+      </div>
+
+      <div class="question-box" id="questionBox">
+        <div class="question-text" id="questionText">Loading question...</div>
+      </div>
+
+      <div class="answers-grid" id="answersGrid"></div>
+
+      <div class="feedback-line" id="feedbackLine"></div>
+
+      <div class="bottom-actions">
+        <button class="icon-btn" onclick="openPlayerWindow('stats')">🎒 PLAYER WINDOW</button>
+        <button class="icon-btn" onclick="fleeBattle()">⎋ FLEE</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== 3. PLAYER WINDOW & SHOP ===================== -->
+  <div class="screen" id="playerWindowScreen">
+    <div class="pw-header">
+      <div class="pw-title">PLAYER WINDOW</div>
+      <button class="back-btn" onclick="backFromPlayerWindow()">← BACK</button>
+    </div>
+    <div class="coin-strip">◆ <span id="pwCoinTop">0</span> COIN</div>
+    <div class="tabs">
+      <div class="tab-btn active" data-tab="stats" onclick="switchTab('stats')">STATS</div>
+      <div class="tab-btn" data-tab="inventory" onclick="switchTab('inventory')">INVENTORY</div>
+      <div class="tab-btn" data-tab="shop" onclick="switchTab('shop')">SHOP</div>
+    </div>
+
+    <!-- STATS TAB -->
+    <div class="tab-content active" id="tab-stats">
+      <div class="grid-2">
+        <div class="stat-card">
+          <div class="stat-card-title">HEALTH</div>
+          <div class="stat-big-row"><span class="stat-big" id="statHp">20</span><span class="stat-unit" id="statMaxHp">/ 20 HP</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">SCORE</div>
+          <div class="stat-big-row"><span class="stat-big cyan" id="statScore">0</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">KEYS HELD</div>
+          <div class="stat-big-row"><span class="stat-big amber" id="statKeys">0</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title">ACCURACY</div>
+          <div class="stat-big-row"><span class="stat-big" id="statAcc">0%</span></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">DUNGEON PROGRESS</div>
+        <div class="stat-big-row"><span class="stat-big cyan" id="statRoom">1</span><span class="stat-unit">/ 50 ROOMS</span></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:2%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-title">CORRECT / WRONG ANSWERS</div>
+        <div class="stat-big-row"><span class="stat-big" id="statCW">0 / 0</span></div>
+      </div>
+    </div>
+
+    <!-- INVENTORY TAB -->
+    <div class="tab-content" id="tab-inventory">
+      <div id="invList"></div>
+    </div>
+
+    <!-- SHOP TAB -->
+    <div class="tab-content" id="tab-shop">
+      <div id="shopList"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <!-- ===================== 4. RESULT SCREEN ===================== -->
+  <div class="screen" id="resultScreen">
+    <div>
+      <div class="result-header">
+        <div class="result-badge" id="rsBadge">🏆</div>
+        <div class="result-title" id="rsTitle">ROOM CLEARED</div>
+        <div class="result-sub" id="rsSub">SECTOR COMPLETED</div>
+      </div>
+      <div class="result-score-block">
+        <div class="result-score-num" id="rsScore">0</div>
+        <div class="result-score-label">TOTAL SCORE</div>
+      </div>
+      <div class="result-stats">
+        <div class="rstat-card">
+          <div class="rstat-label">CORRECT</div>
+          <div class="rstat-val good" id="rsCorrect">0</div>
+        </div>
+        <div class="rstat-card">
+          <div class="rstat-label">WRONG</div>
+          <div class="rstat-val bad" id="rsWrong">0</div>
+        </div>
+        <div class="rstat-card">
+          <div class="rstat-label">ACCURACY</div>
+          <div class="rstat-val" id="rsAccuracy">0%</div>
+        </div>
+        <div class="rstat-card">
+          <div class="rstat-label">COINS HELD</div>
+          <div class="rstat-val amber" id="rsCoin">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="result-actions">
+      <div class="btn primary" onclick="nextRoom()">NEXT SECTOR →</div>
+      <div class="btn secondary" onclick="openPlayerWindow('shop')">VISIT SHOP</div>
+    </div>
+  </div>
+
+  <!-- ===================== 5. GAME OVER SCREEN ===================== -->
+  <div class="screen" id="gameOverScreen">
+    <div class="go-glitch-overlay"></div>
+    <div class="go-header">
+      <div class="go-icon">☠️</div>
+      <div class="go-title">CRITICAL FAILURE</div>
+      <div class="go-sub">Cadet Nova was defeated in sector exploration.<br>Systems offline.</div>
+    </div>
+
+    <div class="go-status">
+      <div class="go-status-card">
+        <div class="go-row"><span>Final Score</span><span class="val" id="goScore">0</span></div>
+        <div class="go-row"><span>Coins Remaining</span><span class="val" id="goCoins">0</span></div>
+        <div class="go-row"><span>Rooms Cleared</span><span class="val" id="goRoom">0</span></div>
+      </div>
+    </div>
+
+    <div class="go-actions">
+      <button class="btn danger-btn" id="reviveBtn" onclick="tryRevive()">REVIVE (50 COINS)</button>
+      <div class="revive-note" id="reviveNote">Restores full HP to continue run</div>
+      <button class="btn secondary" onclick="confirmRestart()">RESTART RUN</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   EMBEDDED QUESTION BANK DATA (questions_data.json)
+   ========================================================= */
+const QUESTIONS_DATA = {
+  "meta": {
+    "tierConfig": {
+      "senang": { "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+      "sederhana": { "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+      "susah": { "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 }
+    }
+  },
+  "questions": [
+    { "id": "mc_001", "type": "multiple_choice", "difficulty": "susah", "question": "What does the acronym IPO stand for?", "options": ["Input, Program, Output", "Input, Process, Output", "Information, Process, Output"], "correctAnswer": 1, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_002", "type": "multiple_choice", "difficulty": "susah", "question": "In the IPO model, what are the values required to produce an output called?", "options": ["Process", "Input", "Output"], "correctAnswer": 1, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_003", "type": "multiple_choice", "difficulty": "susah", "question": "Which part of the IPO model defines the steps to manipulate data?", "options": ["Input", "Process", "Output"], "correctAnswer": 1, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_004", "type": "multiple_choice", "difficulty": "susah", "question": "What is the expected result in the IPO model called?", "options": ["Output", "Input", "Condition"], "correctAnswer": 0, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_005", "type": "multiple_choice", "difficulty": "susah", "question": "Which of the following is a keyword for INPUT?", "options": ["CALCULATE", "DISPLAY", "READ"], "correctAnswer": 2, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_006", "type": "multiple_choice", "difficulty": "susah", "question": "Which of the following is NOT an Input keyword?", "options": ["GET", "GIVEN", "SHOW"], "correctAnswer": 2, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_007", "type": "multiple_choice", "difficulty": "susah", "question": "Which of the following keywords is associated with the PROCESS stage?", "options": ["CHECK", "ENTER", "PRINT"], "correctAnswer": 0, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_008", "type": "multiple_choice", "difficulty": "susah", "question": "Which keyword is typically used for OUTPUT?", "options": ["READ", "DETERMINE", "CONVEY"], "correctAnswer": 2, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_009", "type": "multiple_choice", "difficulty": "susah", "question": "According to the notes, which word can be used as a keyword for both Process and Output?", "options": ["FIND", "CALCULATE", "REPEAT"], "correctAnswer": 0, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_010", "type": "multiple_choice", "difficulty": "susah", "question": "\"DISPLAY\" is a keyword used for which stage?", "options": ["Input", "Process", "Output"], "correctAnswer": 2, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_011", "type": "multiple_choice", "difficulty": "susah", "question": "How many types of Control Structures are mentioned in the notes?", "options": ["2", "3", "4"], "correctAnswer": 1, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_012", "type": "multiple_choice", "difficulty": "susah", "question": "What is a block of programming that analyzes variables and chooses a direction based on given parameters?", "options": ["Output Model", "Control Structure", "Initialization"], "correctAnswer": 1, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_013", "type": "multiple_choice", "difficulty": "susah", "question": "Which control structure executes a series of actions in the exact order they are written?", "options": ["Sequence", "Selection", "Repetition"], "correctAnswer": 0, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_014", "type": "multiple_choice", "difficulty": "susah", "question": "Which control structure makes a decision to determine an output based on the input?", "options": ["Sequence", "Selection", "Initialization"], "correctAnswer": 1, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_015", "type": "multiple_choice", "difficulty": "susah", "question": "Which control structure loops a block of code multiple times?", "options": ["Repetition", "Sequence", "Single Selection"], "correctAnswer": 0, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_016", "type": "multiple_choice", "difficulty": "susah", "question": "To calculate the area of a rectangle, what are the required inputs?", "options": ["base, height", "length, width", "area, perimeter"], "correctAnswer": 1, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_017", "type": "multiple_choice", "difficulty": "susah", "question": "What is the output for calculating the area of a rectangle?", "options": ["Area of rectangle", "Length and width", "Calculate area"], "correctAnswer": 0, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_018", "type": "multiple_choice", "difficulty": "susah", "question": "If a program calculates the mean of 5 test marks, how many inputs are required?", "options": ["1", "3", "5"], "correctAnswer": 2, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_019", "type": "multiple_choice", "difficulty": "susah", "question": "How should multiple required inputs (like testmark1, testmark2) be separated in the IPO model?", "options": ["With a comma (,)", "With a full stop (.)", "With a slash (/)"], "correctAnswer": 0, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_020", "type": "multiple_choice", "difficulty": "susah", "question": "What is the process for the test marks example?", "options": ["Mean of 5 marks", "Calculate the mean of 5 test marks", "testmark1, testmark2..."], "correctAnswer": 1, "coin": 3, "mark": 5, "score": 10, "damageToPlayer": 4 },
+    { "id": "mc_021", "type": "multiple_choice", "difficulty": "sederhana", "question": "What statement is used for a Single Selection structure?", "options": ["IF statement", "IF-ELSE statement", "IF-ELSE IF-ELSE statement"], "correctAnswer": 0, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_022", "type": "multiple_choice", "difficulty": "sederhana", "question": "What is the possible output for the single selection voting example?", "options": ["\"You are entitled to vote\" or \"Too young\"", "\"You are entitled to vote\" or no output", "\"Yes\" or \"No\""], "correctAnswer": 1, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_023", "type": "multiple_choice", "difficulty": "sederhana", "question": "What are the inputs needed to calculate BMI?", "options": ["age, gender", "weight, height", "weight, age"], "correctAnswer": 1, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_024", "type": "multiple_choice", "difficulty": "sederhana", "question": "What are the specific outputs for the BMI multiple selection example?", "options": ["\"Overweight\" or \"Normal\" or \"Underweight\"", "\"Fat\" or \"Thin\" or \"Average\"", "\"High\", \"Medium\", \"Low\""], "correctAnswer": 0, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_025", "type": "multiple_choice", "difficulty": "sederhana", "question": "What is the minimum and maximum limit for multiple selection mentioned in the notes?", "options": ["Min 2, Max 4", "Min 3, Max 5", "Min 1, Max 10"], "correctAnswer": 1, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_026", "type": "multiple_choice", "difficulty": "sederhana", "question": "Which repetition type is used when the number of loops is known?", "options": ["Sentinel-Controlled", "Counter-Controlled", "Sequence-Controlled"], "correctAnswer": 1, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_027", "type": "multiple_choice", "difficulty": "sederhana", "question": "Which repetition type is used when the number of loops is NOT known in advance?", "options": ["Sentinel-Controlled", "Counter-Controlled", "Selection-Controlled"], "correctAnswer": 0, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_028", "type": "multiple_choice", "difficulty": "sederhana", "question": "How many basic processes are involved in a repetition structure?", "options": ["2", "3", "4"], "correctAnswer": 1, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_029", "type": "multiple_choice", "difficulty": "sederhana", "question": "What does the \"I\" stand for in the 3 basic repetition processes?", "options": ["Input", "Initialization", "Iteration"], "correctAnswer": 1, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_030", "type": "multiple_choice", "difficulty": "sederhana", "question": "What does the \"C\" stand for in the 3 basic repetition processes?", "options": ["Condition / Evaluation", "Calculate", "Control"], "correctAnswer": 0, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_031", "type": "multiple_choice", "difficulty": "sederhana", "question": "What does the \"U\" stand for in the 3 basic repetition processes?", "options": ["Until", "Updating", "Under"], "correctAnswer": 1, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_032", "type": "multiple_choice", "difficulty": "sederhana", "question": "The code \"i = 0\" is an example of which loop process?", "options": ["Initialization", "Condition", "Updating"], "correctAnswer": 0, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_033", "type": "multiple_choice", "difficulty": "sederhana", "question": "The code \"i < n\" (e.g., i < 10) is an example of which loop process?", "options": ["Initialization", "Condition", "Updating"], "correctAnswer": 1, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_034", "type": "multiple_choice", "difficulty": "sederhana", "question": "The code \"i = i + 1\" is an example of which loop process?", "options": ["Initialization", "Condition", "Updating"], "correctAnswer": 2, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_035", "type": "multiple_choice", "difficulty": "sederhana", "question": "If a statement says \"Repeat calculate output based on input for X times\", what type of loop is it?", "options": ["Counter-Controlled", "Sentinel-Controlled", "Selection"], "correctAnswer": 0, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_036", "type": "multiple_choice", "difficulty": "sederhana", "question": "If a statement says \"Repeat calculate output based on input until a value is entered\", what type of loop is it?", "options": ["Counter-Controlled", "Sentinel-Controlled", "Sequence"], "correctAnswer": 1, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_037", "type": "multiple_choice", "difficulty": "sederhana", "question": "For dual selection, what does the output result in?", "options": ["Only True Output", "True Output or False Output", "Three different outputs"], "correctAnswer": 1, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_038", "type": "multiple_choice", "difficulty": "sederhana", "question": "Which of the following is a keyword for INPUT?", "options": ["GIVEN", "REPEAT", "FIND"], "correctAnswer": 0, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "mc_039", "type": "multiple_choice", "difficulty": "sederhana", "question": "Which of the following is a keyword for PROCESS?", "options": ["GET", "SHOW", "DETERMINE"], "correctAnswer": 2, "coin": 2, "mark": 3, "score": 8, "damageToPlayer": 2 },
+    { "id": "tf_042", "type": "true_false", "difficulty": "senang", "question": "IPO stands for Input, Process, Output.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_043", "type": "true_false", "difficulty": "senang", "question": "Input refers to the steps used to manipulate data.", "correctAnswer": false, "explanation": "That is Process", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_044", "type": "true_false", "difficulty": "senang", "question": "\"GET\" is a keyword used for Output.", "correctAnswer": false, "explanation": "GET is for Input", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_045", "type": "true_false", "difficulty": "senang", "question": "\"DISPLAY\" is a keyword used for Output.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_046", "type": "true_false", "difficulty": "senang", "question": "\"CALCULATE\" is a keyword used for Process.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_047", "type": "true_false", "difficulty": "senang", "question": "A control structure analyzes variables and chooses a direction based on given parameters.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_048", "type": "true_false", "difficulty": "senang", "question": "There are exactly four types of control structures mentioned in the notes.", "correctAnswer": false, "explanation": "There are 3", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_049", "type": "true_false", "difficulty": "senang", "question": "A Sequence control structure executes actions in the exact order they are written.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_050", "type": "true_false", "difficulty": "senang", "question": "To calculate the mean of 5 test marks, the inputs are testmark1, testmark2, testmark3, testmark4, and testmark5.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_051", "type": "true_false", "difficulty": "senang", "question": "Inputs in an IPO model should be separated by a semicolon (;).", "correctAnswer": false, "explanation": "Comma", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_052", "type": "true_false", "difficulty": "senang", "question": "Single selection uses an IF-ELSE statement.", "correctAnswer": false, "explanation": "IF statement only", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_053", "type": "true_false", "difficulty": "senang", "question": "Dual selection uses an IF-ELSE statement.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_054", "type": "true_false", "difficulty": "senang", "question": "Multiple selection uses an IF-ELSE IF-ELSE statement.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_055", "type": "true_false", "difficulty": "senang", "question": "Determining if a person is \"Retired\" or \"Still working\" is an example of Single Selection.", "correctAnswer": false, "explanation": "It is Dual Selection", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_056", "type": "true_false", "difficulty": "senang", "question": "Determining if someone is entitled to vote or displaying no output is an example of Single Selection.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_057", "type": "true_false", "difficulty": "senang", "question": "To calculate BMI, only the person's weight is required as input.", "correctAnswer": false, "explanation": "Weight and height", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_058", "type": "true_false", "difficulty": "senang", "question": "The BMI example categorizes output into \"Overweight\", \"Normal\", or \"Underweight\".", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_059", "type": "true_false", "difficulty": "senang", "question": "The maximum limit for Multiple Selection choices according to the notes is 10.", "correctAnswer": false, "explanation": "Max is 5", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_060", "type": "true_false", "difficulty": "senang", "question": "The minimum limit for Multiple Selection choices according to the notes is 3.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_061", "type": "true_false", "difficulty": "senang", "question": "Counter-controlled loops are used when the number of loops is NOT known in advance.", "correctAnswer": false, "explanation": "Number of loops IS known", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_062", "type": "true_false", "difficulty": "senang", "question": "Sentinel-controlled loops are used when the number of loops is NOT known in advance.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_063", "type": "true_false", "difficulty": "senang", "question": "Counter-controlled loops run for a specific number of times, such as \"5 times\".", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_064", "type": "true_false", "difficulty": "senang", "question": "Sentinel-controlled loops stop when a specific condition or value is met, such as entering \"-999\".", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_065", "type": "true_false", "difficulty": "senang", "question": "There are three basic processes in repetition: Initialization, Condition, and Updating.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_066", "type": "true_false", "difficulty": "senang", "question": "Initialization sets the starting value of a loop, for example, i = 0.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_067", "type": "true_false", "difficulty": "senang", "question": "The condition process evaluates if a loop should continue, for example, i < 10.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_068", "type": "true_false", "difficulty": "senang", "question": "Updating changes the loop variable, for example, i = i + 1.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_069", "type": "true_false", "difficulty": "senang", "question": "In the Multiple Selection example, the input is only 'height'.", "correctAnswer": false, "explanation": "Weight and height", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_070", "type": "true_false", "difficulty": "senang", "question": "In a Sequence structure, no decisions or IF conditions are evaluated.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_071", "type": "true_false", "difficulty": "senang", "question": "\"ENTER\" is a keyword used for Input.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_072", "type": "true_false", "difficulty": "senang", "question": "\"CHECK\" is a keyword used for Output.", "correctAnswer": false, "explanation": "Process", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_073", "type": "true_false", "difficulty": "senang", "question": "\"CONVEY\" is a keyword used for Process.", "correctAnswer": false, "explanation": "Output", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_074", "type": "true_false", "difficulty": "senang", "question": "\"READ\" is a keyword used for Input.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_075", "type": "true_false", "difficulty": "senang", "question": "\"PRINT\" is a keyword used for Output.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_076", "type": "true_false", "difficulty": "senang", "question": "The output of calculating the area of a rectangle is the \"Area of rectangle\".", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_077", "type": "true_false", "difficulty": "senang", "question": "In the sentinel-controlled temperature example, the input is \"daily temperature until -999 is entered\".", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_078", "type": "true_false", "difficulty": "senang", "question": "The process for the sentinel loop example is to repeat calculating total temperature until -999 is entered.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_079", "type": "true_false", "difficulty": "senang", "question": "The output for the sentinel loop temperature example is \"average temperature\".", "correctAnswer": false, "explanation": "Total temperature", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_080", "type": "true_false", "difficulty": "senang", "question": "In the counter-controlled average example, the output is \"average, sum\".", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_081", "type": "true_false", "difficulty": "senang", "question": "Dual selection produces exactly one possible true output and no false output.", "correctAnswer": false, "explanation": "True output or False output", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_082", "type": "true_false", "difficulty": "senang", "question": "Multiple selection determines the output based on 2 or fewer conditions.", "correctAnswer": false, "explanation": "Min 3, Max 5", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_083", "type": "true_false", "difficulty": "senang", "question": "\"GIVEN\" is an example of an Input keyword.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_084", "type": "true_false", "difficulty": "senang", "question": "\"DETERMINE\" is an example of a Process keyword.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_085", "type": "true_false", "difficulty": "senang", "question": "The expected result in an IPO model is known as the Process.", "correctAnswer": false, "explanation": "It is Output", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_086", "type": "true_false", "difficulty": "senang", "question": "To manipulate input into output, we use the Process step.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_087", "type": "true_false", "difficulty": "senang", "question": "In the Dual Selection example (Retired/Working), the required input is \"age\".", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_088", "type": "true_false", "difficulty": "senang", "question": "In a Single Selection, the output might be completely blank (no output) if the condition is false.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_089", "type": "true_false", "difficulty": "senang", "question": "Counter-controlled loops do not require an Initialization step.", "correctAnswer": false, "explanation": "All loops need the 3 basic processes", "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_090", "type": "true_false", "difficulty": "senang", "question": "\"SHOW\" is a keyword associated with Output.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 },
+    { "id": "tf_091", "type": "true_false", "difficulty": "senang", "question": "The two main topics covered in these notes are Problem Analysis and IPO Models.", "correctAnswer": true, "coin": 1, "mark": 1, "score": 5, "damageToPlayer": 1 }
+  ]
+};
+
+/* =========================================================
+   CORE LOGIC CLASSES (Phase 2 Integration)
+   ========================================================= */
+function round1(n) { return Math.round(n * 10) / 10; }
+
+class Player {
+  constructor() {
+    this.maxHp = 20;
+    this.hp = 20;
+    this.coin = 0;
+    this.score = 0;
+    this.keys = 0;
+    this.powerUps = [];
+    this.combo = 0;
+    this.maxCombo = 0;
+    this.correctCount = 0;
+    this.wrongCount = 0;
+    this.roomReached = 1;
+    this.isAlive = true;
+    this.attackMultiplier = 1;
+    this.shield = 0;
+    this.coinMagnet = false;
+  }
+  reset() { Object.assign(this, new Player()); }
+}
+
+const ENEMY_TYPES = [
+  { name: "Firewall Wraith", sprite: "👾", type: "normal", maxHp: 10 },
+  { name: "Logic Spectre", sprite: "👻", type: "normal", maxHp: 12 },
+  { name: "Syntax Marauder", sprite: "🤖", type: "normal", maxHp: 15 },
+  { name: "Overlord Kernel", sprite: "👹", type: "boss", maxHp: 30 }
+];
+
+class Enemy {
+  constructor(roomNumber = 1) {
+    const isBoss = roomNumber % 5 === 0;
+    if (isBoss) {
+      const template = ENEMY_TYPES[3];
+      this.name = template.name;
+      this.sprite = template.sprite;
+      this.type = "boss";
+      this.maxHp = template.maxHp;
+    } else {
+      const template = ENEMY_TYPES[Math.floor(Math.random() * 3)];
+      this.name = template.name;
+      this.sprite = template.sprite;
+      this.type = "normal";
+      this.maxHp = template.maxHp;
+    }
+    this.hp = this.maxHp;
+    this.isDefeated = false;
+  }
+}
+
+const POWER_UP_POOL = [
+  { id: "extra_hp", name: "Extra HP +5", icon: "❤️‍🩹", desc: "Permanently raises max HP by 5", price: 15, apply: (p) => { p.maxHp += 5; p.hp += 5; } },
+  { id: "attack_boost", name: "Attack Boost x1.5", icon: "⚔️", desc: "Deal 1.5x mark damage to enemies", price: 20, apply: (p) => { p.attackMultiplier = 1.5; } },
+  { id: "shield", name: "Shield (1 hit)", icon: "🛡️", desc: "Blocks the next wrong-answer damage", price: 10, apply: (p) => { p.shield += 1; } },
+  { id: "coin_magnet", name: "Coin Magnet", icon: "🧲", desc: "+20% coin from correct answers", price: 25, apply: (p) => { p.coinMagnet = true; } },
+  { id: "revive", name: "Full Revive", icon: "✨", desc: "Restore HP to maximum instantly", price: 50, apply: (p) => { p.hp = p.maxHp; p.isAlive = true; } }
+];
+
+class CombatEngine {
+  constructor(player, enemy) {
+    this.player = player;
+    this.enemy = enemy;
+  }
+
+  resolveAnswer(question, isCorrect) {
+    const result = {
+      correct: isCorrect,
+      comboCount: this.player.combo,
+      enemyDefeated: false,
+      playerDefeated: false,
+      reward: null
+    };
+
+    if (isCorrect) {
+      this.player.combo += 1;
+      this.player.maxCombo = Math.max(this.player.maxCombo, this.player.combo);
+      this.player.correctCount += 1;
+
+      const comboBonus = round1(this.player.combo * 0.2);
+      let coinsEarned = round1(question.coin + comboBonus);
+      const scoreEarned = round1(question.score + comboBonus);
+
+      if (this.player.coinMagnet) coinsEarned = round1(coinsEarned * 1.2);
+
+      const damageDealt = round1(question.mark * this.player.attackMultiplier);
+
+      this.player.coin = round1(this.player.coin + coinsEarned);
+      this.player.score = round1(this.player.score + scoreEarned);
+      this.enemy.hp = Math.max(0, round1(this.enemy.hp - damageDealt));
+
+      result.damageDealt = damageDealt;
+      result.coinsEarned = coinsEarned;
+      result.scoreEarned = scoreEarned;
+      result.comboBonus = comboBonus;
+
+      if (this.enemy.hp <= 0 && !this.enemy.isDefeated) {
+        this.enemy.isDefeated = true;
+        result.enemyDefeated = true;
+        result.reward = this.generateReward();
+      }
+    } else {
+      this.player.wrongCount += 1;
+      this.player.combo = 0;
+
+      let damageTaken = question.damageToPlayer;
+      if (this.player.shield > 0) {
+        this.player.shield -= 1;
+        damageTaken = 0;
+        result.shieldBlocked = true;
+      }
+
+      this.player.hp = Math.max(0, this.player.hp - damageTaken);
+      result.damageTaken = damageTaken;
+
+      if (this.player.hp <= 0) {
+        this.player.isAlive = false;
+        result.playerDefeated = true;
+      }
+    }
+    return result;
+  }
+
+  generateReward() {
+    const isBoss = this.enemy.type === "boss";
+    const bonusCoin = isBoss ? 20 : 5;
+    const dropKey = isBoss ? true : Math.random() < 0.5;
+    const dropPowerUp = Math.random() < (isBoss ? 0.75 : 0.3);
+
+    this.player.coin = round1(this.player.coin + bonusCoin);
+    if (dropKey) this.player.keys += 1;
+
+    let powerUp = null;
+    if (dropPowerUp) {
+      const available = POWER_UP_POOL.filter(p => p.id !== "revive");
+      const pick = available[Math.floor(Math.random() * available.length)];
+      pick.apply(this.player);
+      if (!this.player.powerUps.includes(pick.name)) {
+        this.player.powerUps.push(pick.name);
+      }
+      powerUp = pick.name;
+    }
+
+    return { key: dropKey, powerUp, bonusCoin };
+  }
+}
+
+/* =========================================================
+   APPLICATION STATE & CONTROLLER
+   ========================================================= */
+const globalPlayer = new Player();
+let currentEnemy = null;
+let currentCombat = null;
+let roomQueue = [];
+let qIndex = 0;
+let previousScreen = "menuScreen";
+let locked = false;
+
+// Screen management
+function showScreen(screenId) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(screenId).classList.add("active");
+}
+
+function updateContinueButton() {
+  const continueBtn = document.getElementById("continueBtn");
+  if (globalPlayer.roomReached > 1 || globalPlayer.score > 0) {
+    continueBtn.classList.remove("disabled");
+  } else {
+    continueBtn.classList.add("disabled");
+  }
+}
+
+// Start New Run
+function startNewGame() {
+  globalPlayer.reset();
+  setupRoom();
+  showScreen("battleScreen");
+}
+
+function continueGame() {
+  if (globalPlayer.hp <= 0) return;
+  setupRoom();
+  showScreen("battleScreen");
+}
+
+// Room & Battle Setup
+function setupRoom() {
+  currentEnemy = new Enemy(globalPlayer.roomReached);
+  currentCombat = new CombatEngine(globalPlayer, currentEnemy);
+  
+  // Shuffle & extract questions for room
+  const shuffled = [...QUESTIONS_DATA.questions].sort(() => 0.5 - Math.random());
+  roomQueue = shuffled.slice(0, 5);
+  qIndex = 0;
+
+  document.getElementById("victoryOverlay").classList.remove("show");
+  
+  const enemyCard = document.getElementById("enemyCard");
+  if (currentEnemy.type === "boss") {
+    enemyCard.classList.add("boss");
+  } else {
+    enemyCard.classList.remove("boss");
+  }
+
+  document.getElementById("enemySprite").textContent = currentEnemy.sprite;
+
+  renderBattleStatus();
+  renderQuestion();
+}
+
+function renderHpBar(trackId, hp, maxHp) {
+  const track = document.getElementById(trackId);
+  track.innerHTML = "";
+  const segments = 10;
+  const filledSegments = Math.round((hp / maxHp) * segments);
+  const pct = hp / maxHp;
+  for (let i = 0; i < segments; i++) {
+    const seg = document.createElement("div");
+    seg.className = "hp-segment";
+    if (i < filledSegments) {
+      seg.classList.add("filled");
+      if (pct <= 0.25) seg.classList.add("low");
+      else if (pct <= 0.5) seg.classList.add("mid");
+    }
+    track.appendChild(seg);
+  }
+}
+
+function renderBattleStatus() {
+  renderHpBar("enemyHpTrack", currentEnemy.hp, currentEnemy.maxHp);
+  renderHpBar("playerHpTrack", globalPlayer.hp, globalPlayer.maxHp);
+  document.getElementById("enemyHpNum").textContent = `${currentEnemy.hp} / ${currentEnemy.maxHp}`;
+  document.getElementById("playerHpNum").textContent = `${globalPlayer.hp} / ${globalPlayer.maxHp}`;
+  document.getElementById("enemyName").textContent = currentEnemy.name;
+  document.getElementById("enemyType").textContent = currentEnemy.type.toUpperCase();
+
+  const combo = document.getElementById("comboBadge");
+  if (globalPlayer.combo > 0) {
+    combo.textContent = `COMBO x${globalPlayer.combo}`;
+    combo.classList.add("show");
+  } else {
+    combo.classList.remove("show");
+  }
+}
+
+function renderQuestion() {
+  if (qIndex >= roomQueue.length) {
+    if (currentEnemy.hp > 0) {
+      // Refresh question queue if enemy is not defeated yet
+      roomQueue = [...QUESTIONS_DATA.questions].sort(() => 0.5 - Math.random()).slice(0, 5);
+      qIndex = 0;
+    }
+  }
+
+  const q = roomQueue[qIndex];
+  document.getElementById("qCounter").textContent = `QUESTION ${qIndex + 1} / ${roomQueue.length}`;
+  document.getElementById("qDifficulty").textContent = `[${q.difficulty.toUpperCase()}]`;
+  document.getElementById("questionText").textContent = q.question;
+  document.getElementById("feedbackLine").textContent = "";
+  document.getElementById("feedbackLine").className = "feedback-line";
+
+  const grid = document.getElementById("answersGrid");
+  grid.innerHTML = "";
+  grid.className = "answers-grid" + (q.type === "true_false" ? " tf-grid" : "");
+
+  if (q.type === "multiple_choice") {
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement("button");
+      btn.className = "answer-btn";
+      btn.innerHTML = `<span class="opt-letter">${String.fromCharCode(65 + idx)}</span> ${opt}`;
+      btn.onclick = () => submitAnswer(idx === q.correctAnswer, btn, idx);
+      grid.appendChild(btn);
+    });
+  } else {
+    [true, false].forEach((val) => {
+      const btn = document.createElement("button");
+      btn.className = "answer-btn";
+      btn.textContent = val ? "TRUE" : "FALSE";
+      btn.onclick = () => submitAnswer(val === q.correctAnswer, btn, val);
+      grid.appendChild(btn);
+    });
+  }
+  locked = false;
+}
+
+function spawnFloatDmg(text, cls) {
+  const el = document.createElement("div");
+  el.className = `float-dmg ${cls}`;
+  el.textContent = text;
+  document.querySelector(".arena").appendChild(el);
+  setTimeout(() => el.remove(), 900);
+}
+
+function submitAnswer(isCorrect, btnEl, pickedValue) {
+  if (locked) return;
+  locked = true;
+
+  const q = roomQueue[qIndex];
+  const allBtns = document.querySelectorAll(".answer-btn");
+  allBtns.forEach(b => b.disabled = true);
+
+  const qBox = document.getElementById("questionBox");
+  const fb = document.getElementById("feedbackLine");
+
+  const res = currentCombat.resolveAnswer(q, isCorrect);
+
+  if (res.correct) {
+    btnEl.classList.add("correct-pick");
+    qBox.classList.add("correct-flash");
+    setTimeout(() => qBox.classList.remove("correct-flash"), 350);
+
+    document.getElementById("enemySprite").classList.add("hit");
+    setTimeout(() => document.getElementById("enemySprite").classList.remove("hit"), 350);
+    spawnFloatDmg(`-${res.damageDealt}`, "dmg-enemy");
+
+    fb.textContent = `CORRECT! +${res.coinsEarned} coin, +${res.scoreEarned} score (combo bonus +${res.comboBonus})`;
+    fb.className = "feedback-line right";
+
+    const comboBadge = document.getElementById("comboBadge");
+    comboBadge.classList.add("pulse");
+    setTimeout(() => comboBadge.classList.remove("pulse"), 400);
+
+  } else {
+    btnEl.classList.add("wrong-pick");
+    qBox.classList.add("glitch");
+    setTimeout(() => qBox.classList.remove("glitch"), 350);
+
+    if (q.type === "multiple_choice") {
+      allBtns[q.correctAnswer].classList.add("reveal-correct");
+    } else {
+      allBtns[q.correctAnswer ? 0 : 1].classList.add("reveal-correct");
+    }
+
+    document.getElementById("playerSprite").classList.add("hit");
+    setTimeout(() => document.getElementById("playerSprite").classList.remove("hit"), 350);
+    spawnFloatDmg(res.shieldBlocked ? "BLOCKED!" : `-${res.damageTaken}`, "dmg-player");
+
+    const correctText = q.type === "multiple_choice" ? q.options[q.correctAnswer] : (q.correctAnswer ? "True" : "False");
+    fb.textContent = `WRONG. Correct answer: "${correctText}"${q.explanation ? " — " + q.explanation : ""}`;
+    fb.className = "feedback-line wrong";
+  }
+
+  renderBattleStatus();
+
+  setTimeout(() => {
+    if (res.enemyDefeated) {
+      showVictoryOverlay(res.reward);
+    } else if (res.playerDefeated) {
+      showGameOver();
+    } else {
+      qIndex++;
+      renderQuestion();
+    }
+  }, 1400);
+}
+
+function showVictoryOverlay(reward) {
+  document.getElementById("rwCoin").textContent = `+${reward ? reward.bonusCoin : 0}`;
+  document.getElementById("rwKey").textContent = reward && reward.key ? "Obtained 🔑" : "None";
+  document.getElementById("rwPowerup").textContent = reward && reward.powerUp ? reward.powerUp : "None";
+  document.getElementById("victoryOverlay").classList.add("show");
+}
+
+function nextQuestionOrRoom() {
+  showRoomResultScreen();
+}
+
+function fleeBattle() {
+  globalPlayer.combo = 0;
+  showScreen("menuScreen");
+  updateContinueButton();
+}
+
+/* =========================================================
+   RESULT SCREEN LOGIC
+   ========================================================= */
+function showRoomResultScreen() {
+  const total = globalPlayer.correctCount + globalPlayer.wrongCount;
+  const acc = total > 0 ? Math.round((globalPlayer.correctCount / total) * 100) : 0;
+
+  document.getElementById("rsBadge").textContent = currentEnemy.type === "boss" ? "🏆" : "🎖️";
+  document.getElementById("rsTitle").textContent = currentEnemy.type === "boss" ? "BOSS DEFEATED!" : "SECTOR CLEARED";
+  document.getElementById("rsSub").textContent = `ROOM ${globalPlayer.roomReached} SECURED`;
+  document.getElementById("rsScore").textContent = Math.round(globalPlayer.score);
+  document.getElementById("rsCorrect").textContent = globalPlayer.correctCount;
+  document.getElementById("rsWrong").textContent = globalPlayer.wrongCount;
+  document.getElementById("rsAccuracy").textContent = `${acc}%`;
+  document.getElementById("rsCoin").textContent = Math.round(globalPlayer.coin);
+
+  showScreen("resultScreen");
+}
+
+function nextRoom() {
+  globalPlayer.roomReached += 1;
+  setupRoom();
+  showScreen("battleScreen");
+}
+
+/* =========================================================
+   GAME OVER LOGIC
+   ========================================================= */
+function showGameOver() {
+  document.getElementById("goScore").textContent = Math.round(globalPlayer.score);
+  document.getElementById("goCoins").textContent = Math.round(globalPlayer.coin);
+  document.getElementById("goRoom").textContent = globalPlayer.roomReached;
+
+  const reviveBtn = document.getElementById("reviveBtn");
+  if (globalPlayer.coin >= 50) {
+    reviveBtn.disabled = false;
+    document.getElementById("reviveNote").textContent = "Spend 50 coins to restore HP and keep run active";
+  } else {
+    reviveBtn.disabled = true;
+    document.getElementById("reviveNote").textContent = "Insufficient coins (Need 50 coins to revive)";
+  }
+
+  showScreen("gameOverScreen");
+}
+
+function tryRevive() {
+  if (globalPlayer.coin >= 50) {
+    globalPlayer.coin -= 50;
+    globalPlayer.hp = globalPlayer.maxHp;
+    globalPlayer.isAlive = true;
+    globalPlayer.combo = 0;
+    setupRoom();
+    showScreen("battleScreen");
+  }
+}
+
+function confirmRestart() {
+  globalPlayer.reset();
+  updateContinueButton();
+  showScreen("menuScreen");
+}
+
+/* =========================================================
+   PLAYER WINDOW & SHOP LOGIC
+   ========================================================= */
+function openPlayerWindow(tab) {
+  const currentActive = document.querySelector(".screen.active");
+  if (currentActive && currentActive.id !== "playerWindowScreen") {
+    previousScreen = currentActive.id;
+  }
+  showScreen("playerWindowScreen");
+  switchTab(tab || "stats");
+  renderPlayerWindow();
+}
+
+function backFromPlayerWindow() {
+  showScreen(previousScreen);
+  updateContinueButton();
+}
+
+function switchTab(tab) {
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+  document.querySelectorAll(".tab-content").forEach(c => c.classList.toggle("active", c.id === `tab-${tab}`));
+}
+
+function renderPlayerWindow() {
+  document.getElementById("pwCoinTop").textContent = Math.round(globalPlayer.coin);
+  document.getElementById("statHp").textContent = globalPlayer.hp;
+  document.getElementById("statMaxHp").textContent = `/ ${globalPlayer.maxHp} HP`;
+  document.getElementById("statScore").textContent = Math.round(globalPlayer.score);
+  document.getElementById("statKeys").textContent = globalPlayer.keys;
+
+  const total = globalPlayer.correctCount + globalPlayer.wrongCount;
+  const acc = total > 0 ? Math.round((globalPlayer.correctCount / total) * 100) : 0;
+  document.getElementById("statAcc").textContent = `${acc}%`;
+  document.getElementById("statRoom").textContent = globalPlayer.roomReached;
+  document.getElementById("progressFill").style.width = `${Math.min(100, (globalPlayer.roomReached / 50) * 100)}%`;
+  document.getElementById("statCW").textContent = `${globalPlayer.correctCount} / ${globalPlayer.wrongCount}`;
+
+  renderInventory();
+  renderShop();
+}
+
+function renderInventory() {
+  const list = document.getElementById("invList");
+  if (globalPlayer.powerUps.length === 0) {
+    list.innerHTML = `<div class="empty-state">No power-ups active yet. Defeat enemies or visit the Shop.</div>`;
+    return;
+  }
+  list.innerHTML = globalPlayer.powerUps.map(name => {
+    const item = POWER_UP_POOL.find(i => i.name === name);
+    return `<div class="inv-item">
+      <div class="inv-icon">${item ? item.icon : "✦"}</div>
+      <div>
+        <div class="inv-name">${name}</div>
+        <div class="inv-desc">${item ? item.desc : "Active effect"}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderShop() {
+  const list = document.getElementById("shopList");
+  list.innerHTML = POWER_UP_POOL.map(item => {
+    const owned = item.id !== "revive" && globalPlayer.powerUps.includes(item.name);
+    const canAfford = globalPlayer.coin >= item.price;
+    const disabled = owned || !canAfford;
+    return `<div class="shop-item">
+      <div class="shop-icon">${item.icon}</div>
+      <div class="shop-info">
+        <div class="shop-name">${item.name}</div>
+        <div class="shop-desc">${item.desc} · ◆${item.price}</div>
+      </div>
+      <button class="buy-btn" ${disabled ? "disabled" : ""} onclick="buyItem('${item.id}')">
+        ${owned ? "OWNED" : "BUY"}
+      </button>
+    </div>`;
+  }).join("");
+}
+
+function buyItem(id) {
+  const item = POWER_UP_POOL.find(i => i.id === id);
+  if (!item || globalPlayer.coin < item.price) return;
+
+  globalPlayer.coin -= item.price;
+  item.apply(globalPlayer);
+
+  if (item.id !== "revive" && !globalPlayer.powerUps.includes(item.name)) {
+    globalPlayer.powerUps.push(item.name);
+  }
+
+  showToast(`Purchased ${item.name}!`);
+  renderPlayerWindow();
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove("show"), 1800);
+}
+
+// Initial Boot
+updateContinueButton();
+</script>
+
+</body>
+</html>
