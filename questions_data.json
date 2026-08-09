@@ -1,0 +1,1227 @@
+{
+  "meta": {
+    "tierConfig": {
+      "senang": {
+        "coin": 1,
+        "mark": 1,
+        "score": 5,
+        "damageToPlayer": 1
+      },
+      "sederhana": {
+        "coin": 2,
+        "mark": 3,
+        "score": 8,
+        "damageToPlayer": 2
+      },
+      "susah": {
+        "coin": 3,
+        "mark": 5,
+        "score": 10,
+        "damageToPlayer": 4
+      }
+    },
+    "summary": {
+      "total": 89,
+      "multiple_choice": 39,
+      "true_false": 50,
+      "by_difficulty": {
+        "senang": 50,
+        "sederhana": 19,
+        "susah": 20
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "mc_001",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "What does the acronym IPO stand for?",
+      "options": [
+        "Input, Program, Output",
+        "Input, Process, Output",
+        "Information, Process, Output"
+      ],
+      "correctAnswer": 1,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_002",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "In the IPO model, what are the values required to produce an output called?",
+      "options": [
+        "Process",
+        "Input",
+        "Output"
+      ],
+      "correctAnswer": 1,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_003",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "Which part of the IPO model defines the steps to manipulate data?",
+      "options": [
+        "Input",
+        "Process",
+        "Output"
+      ],
+      "correctAnswer": 1,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_004",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "What is the expected result in the IPO model called?",
+      "options": [
+        "Output",
+        "Input",
+        "Condition"
+      ],
+      "correctAnswer": 0,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_005",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "Which of the following is a keyword for INPUT?",
+      "options": [
+        "CALCULATE",
+        "DISPLAY",
+        "READ"
+      ],
+      "correctAnswer": 2,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_006",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "Which of the following is NOT an Input keyword?",
+      "options": [
+        "GET",
+        "GIVEN",
+        "SHOW"
+      ],
+      "correctAnswer": 2,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_007",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "Which of the following keywords is associated with the PROCESS stage?",
+      "options": [
+        "CHECK",
+        "ENTER",
+        "PRINT"
+      ],
+      "correctAnswer": 0,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_008",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "Which keyword is typically used for OUTPUT?",
+      "options": [
+        "READ",
+        "DETERMINE",
+        "CONVEY"
+      ],
+      "correctAnswer": 2,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_009",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "According to the notes, which word can be used as a keyword for both Process and Output?",
+      "options": [
+        "FIND",
+        "CALCULATE",
+        "REPEAT"
+      ],
+      "correctAnswer": 0,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_010",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "\"DISPLAY\" is a keyword used for which stage?",
+      "options": [
+        "Input",
+        "Process",
+        "Output"
+      ],
+      "correctAnswer": 2,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_011",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "How many types of Control Structures are mentioned in the notes?",
+      "options": [
+        "2",
+        "3",
+        "4"
+      ],
+      "correctAnswer": 1,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_012",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "What is a block of programming that analyzes variables and chooses a direction based on given parameters?",
+      "options": [
+        "Output Model",
+        "Control Structure",
+        "Initialization"
+      ],
+      "correctAnswer": 1,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_013",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "Which control structure executes a series of actions in the exact order they are written?",
+      "options": [
+        "Sequence",
+        "Selection",
+        "Repetition"
+      ],
+      "correctAnswer": 0,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_014",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "Which control structure makes a decision to determine an output based on the input?",
+      "options": [
+        "Sequence",
+        "Selection",
+        "Initialization"
+      ],
+      "correctAnswer": 1,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_015",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "Which control structure loops a block of code multiple times?",
+      "options": [
+        "Repetition",
+        "Sequence",
+        "Single Selection"
+      ],
+      "correctAnswer": 0,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_016",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "To calculate the area of a rectangle, what are the required inputs?",
+      "options": [
+        "base, height",
+        "length, width",
+        "area, perimeter"
+      ],
+      "correctAnswer": 1,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_017",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "What is the output for calculating the area of a rectangle?",
+      "options": [
+        "Area of rectangle",
+        "Length and width",
+        "Calculate area"
+      ],
+      "correctAnswer": 0,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_018",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "If a program calculates the mean of 5 test marks, how many inputs are required?",
+      "options": [
+        "1",
+        "3",
+        "5"
+      ],
+      "correctAnswer": 2,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_019",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "How should multiple required inputs (like testmark1, testmark2) be separated in the IPO model?",
+      "options": [
+        "With a comma (,)",
+        "With a full stop (.)",
+        "With a slash (/)"
+      ],
+      "correctAnswer": 0,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_020",
+      "type": "multiple_choice",
+      "difficulty": "susah",
+      "question": "What is the process for the test marks example?",
+      "options": [
+        "Mean of 5 marks",
+        "Calculate the mean of 5 test marks",
+        "testmark1, testmark2..."
+      ],
+      "correctAnswer": 1,
+      "coin": 3,
+      "mark": 5,
+      "score": 10,
+      "damageToPlayer": 4
+    },
+    {
+      "id": "mc_021",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "What statement is used for a Single Selection structure?",
+      "options": [
+        "IF statement",
+        "IF-ELSE statement",
+        "IF-ELSE IF-ELSE statement"
+      ],
+      "correctAnswer": 0,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_022",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "What is the possible output for the single selection voting example?",
+      "options": [
+        "\"You are entitled to vote\" or \"Too young\"",
+        "\"You are entitled to vote\" or no output",
+        "\"Yes\" or \"No\""
+      ],
+      "correctAnswer": 1,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_023",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "What are the inputs needed to calculate BMI?",
+      "options": [
+        "age, gender",
+        "weight, height",
+        "weight, age"
+      ],
+      "correctAnswer": 1,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_024",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "What are the specific outputs for the BMI multiple selection example?",
+      "options": [
+        "\"Overweight\" or \"Normal\" or \"Underweight\"",
+        "\"Fat\" or \"Thin\" or \"Average\"",
+        "\"High\", \"Medium\", \"Low\""
+      ],
+      "correctAnswer": 0,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_025",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "What is the minimum and maximum limit for multiple selection mentioned in the notes?",
+      "options": [
+        "Min 2, Max 4",
+        "Min 3, Max 5",
+        "Min 1, Max 10"
+      ],
+      "correctAnswer": 1,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_026",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "Which repetition type is used when the number of loops is known?",
+      "options": [
+        "Sentinel-Controlled",
+        "Counter-Controlled",
+        "Sequence-Controlled"
+      ],
+      "correctAnswer": 1,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_027",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "Which repetition type is used when the number of loops is NOT known in advance?",
+      "options": [
+        "Sentinel-Controlled",
+        "Counter-Controlled",
+        "Selection-Controlled"
+      ],
+      "correctAnswer": 0,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_028",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "How many basic processes are involved in a repetition structure?",
+      "options": [
+        "2",
+        "3",
+        "4"
+      ],
+      "correctAnswer": 1,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_029",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "What does the \"I\" stand for in the 3 basic repetition processes?",
+      "options": [
+        "Input",
+        "Initialization",
+        "Iteration"
+      ],
+      "correctAnswer": 1,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_030",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "What does the \"C\" stand for in the 3 basic repetition processes?",
+      "options": [
+        "Condition / Evaluation",
+        "Calculate",
+        "Control"
+      ],
+      "correctAnswer": 0,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_031",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "What does the \"U\" stand for in the 3 basic repetition processes?",
+      "options": [
+        "Until",
+        "Updating",
+        "Under"
+      ],
+      "correctAnswer": 1,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_032",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "The code \"i = 0\" is an example of which loop process?",
+      "options": [
+        "Initialization",
+        "Condition",
+        "Updating"
+      ],
+      "correctAnswer": 0,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_033",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "The code \"i < n\" (e.g., i < 10) is an example of which loop process?",
+      "options": [
+        "Initialization",
+        "Condition",
+        "Updating"
+      ],
+      "correctAnswer": 1,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_034",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "The code \"i = i + 1\" is an example of which loop process?",
+      "options": [
+        "Initialization",
+        "Condition",
+        "Updating"
+      ],
+      "correctAnswer": 2,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_035",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "If a statement says \"Repeat calculate output based on input for X times\", what type of loop is it?",
+      "options": [
+        "Counter-Controlled",
+        "Sentinel-Controlled",
+        "Selection"
+      ],
+      "correctAnswer": 0,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_036",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "If a statement says \"Repeat calculate output based on input until a value is entered\", what type of loop is it?",
+      "options": [
+        "Counter-Controlled",
+        "Sentinel-Controlled",
+        "Sequence"
+      ],
+      "correctAnswer": 1,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_037",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "For dual selection, what does the output result in?",
+      "options": [
+        "Only True Output",
+        "True Output or False Output",
+        "Three different outputs"
+      ],
+      "correctAnswer": 1,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_038",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "Which of the following is a keyword for INPUT?",
+      "options": [
+        "GIVEN",
+        "REPEAT",
+        "FIND"
+      ],
+      "correctAnswer": 0,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "mc_039",
+      "type": "multiple_choice",
+      "difficulty": "sederhana",
+      "question": "Which of the following is a keyword for PROCESS?",
+      "options": [
+        "GET",
+        "SHOW",
+        "DETERMINE"
+      ],
+      "correctAnswer": 2,
+      "coin": 2,
+      "mark": 3,
+      "score": 8,
+      "damageToPlayer": 2
+    },
+    {
+      "id": "tf_042",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "IPO stands for Input, Process, Output.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_043",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Input refers to the steps used to manipulate data.",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "That is Process"
+    },
+    {
+      "id": "tf_044",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "\"GET\" is a keyword used for Output.",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "GET is for Input"
+    },
+    {
+      "id": "tf_045",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "\"DISPLAY\" is a keyword used for Output.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_046",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "\"CALCULATE\" is a keyword used for Process.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_047",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "A control structure analyzes variables and chooses a direction based on given parameters.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_048",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "There are exactly four types of control structures mentioned in the notes.",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "There are 3"
+    },
+    {
+      "id": "tf_049",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "A Sequence control structure executes actions in the exact order they are written.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_050",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "To calculate the mean of 5 test marks, the inputs are testmark1, testmark2, testmark3, testmark4, and testmark5.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_051",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Inputs in an IPO model should be separated by a semicolon (;).",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "Comma"
+    },
+    {
+      "id": "tf_052",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Single selection uses an IF-ELSE statement.",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "IF statement only"
+    },
+    {
+      "id": "tf_053",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Dual selection uses an IF-ELSE statement.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_054",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Multiple selection uses an IF-ELSE IF-ELSE statement.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_055",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Determining if a person is \"Retired\" or \"Still working\" is an example of Single Selection.",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "It is Dual Selection"
+    },
+    {
+      "id": "tf_056",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Determining if someone is entitled to vote or displaying no output is an example of Single Selection.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_057",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "To calculate BMI, only the person's weight is required as input.",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "Weight and height"
+    },
+    {
+      "id": "tf_058",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "The BMI example categorizes output into \"Overweight\", \"Normal\", or \"Underweight\".",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_059",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "The maximum limit for Multiple Selection choices according to the notes is 10.",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "Max is 5"
+    },
+    {
+      "id": "tf_060",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "The minimum limit for Multiple Selection choices according to the notes is 3.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_061",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Counter-controlled loops are used when the number of loops is NOT known in advance.",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "Number of loops IS known"
+    },
+    {
+      "id": "tf_062",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Sentinel-controlled loops are used when the number of loops is NOT known in advance.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_063",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Counter-controlled loops run for a specific number of times, such as \"5 times\".",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_064",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Sentinel-controlled loops stop when a specific condition or value is met, such as entering \"-999\".",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_065",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "There are three basic processes in repetition: Initialization, Condition, and Updating.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_066",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Initialization sets the starting value of a loop, for example, i = 0.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_067",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "The condition process evaluates if a loop should continue, for example, i < 10.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_068",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Updating changes the loop variable, for example, i = i + 1.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_069",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "In the Multiple Selection example, the input is only 'height'.",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "Weight and height"
+    },
+    {
+      "id": "tf_070",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "In a Sequence structure, no decisions or IF conditions are evaluated.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_071",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "\"ENTER\" is a keyword used for Input.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_072",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "\"CHECK\" is a keyword used for Output.",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "Process"
+    },
+    {
+      "id": "tf_073",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "\"CONVEY\" is a keyword used for Process.",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "Output"
+    },
+    {
+      "id": "tf_074",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "\"READ\" is a keyword used for Input.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_075",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "\"PRINT\" is a keyword used for Output.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_076",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "The output of calculating the area of a rectangle is the \"Area of rectangle\".",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_077",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "In the sentinel-controlled temperature example, the input is \"daily temperature until -999 is entered\".",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_078",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "The process for the sentinel loop example is to repeat calculating total temperature until -999 is entered.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_079",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "The output for the sentinel loop temperature example is \"average temperature\".",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "Total temperature"
+    },
+    {
+      "id": "tf_080",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "In the counter-controlled average example, the output is \"average, sum\".",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_081",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Dual selection produces exactly one possible true output and no false output.",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "True output or False output"
+    },
+    {
+      "id": "tf_082",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Multiple selection determines the output based on 2 or fewer conditions.",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "Min 3, Max 5"
+    },
+    {
+      "id": "tf_083",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "\"GIVEN\" is an example of an Input keyword.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_084",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "\"DETERMINE\" is an example of a Process keyword.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_085",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "The expected result in an IPO model is known as the Process.",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "It is Output"
+    },
+    {
+      "id": "tf_086",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "To manipulate input into output, we use the Process step.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_087",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "In the Dual Selection example (Retired/Working), the required input is \"age\".",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_088",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "In a Single Selection, the output might be completely blank (no output) if the condition is false.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_089",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "Counter-controlled loops do not require an Initialization step.",
+      "correctAnswer": false,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1,
+      "explanation": "All loops need the 3 basic processes"
+    },
+    {
+      "id": "tf_090",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "\"SHOW\" is a keyword associated with Output.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    },
+    {
+      "id": "tf_091",
+      "type": "true_false",
+      "difficulty": "senang",
+      "question": "The two main topics covered in these notes are Problem Analysis and IPO Models.",
+      "correctAnswer": true,
+      "coin": 1,
+      "mark": 1,
+      "score": 5,
+      "damageToPlayer": 1
+    }
+  ]
+}
